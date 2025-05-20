@@ -1,0 +1,57 @@
+
+
+Create the routes/api for the products/items
+
+GET /api/items --- this will get all the items available
+GET /api/items/:item_id --- this will get a certain item with item_id
+POST /api/items/. --- this will add a new item, the new items info will be added through the headers and json
+PUT. /api/items/:item_id. --- this will allow the items info to be modified, like price, size, etc.
+DELETE. /api/items/:item_id. --- this will delete an item with item_id
+
+
+Create the routes/api for the cart
+
+GET  /api/cart/:user_id   --- this will get all the items in the current cart for the user
+POST  /api/cart/:user_id/items/:item_id.  --- this will add a new item to the cart
+PUT    /api/cart/:user_id/Items/:items_id. --- this will allow the user to modify this item that is in the cart
+DELETE /api/cart/:user_id/items/:items_id --- this will allow the user to remove an item from the cart
+DELETE /api/cart/:user_id --- this will delete the cart for user_id
+
+
+
+
+/// schema
+
+CREATE TABLE users(
+	id SERIAL PRIMARY KEY,
+	username VARCHAR(50) UNIQUE NOT NULL,
+	password VARCHAR(255) NOT NULL,
+	email VARCHAR(100) UNIQUE NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE items (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  category VARCHAR(50),
+  image_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE cart(
+	id SERIAL PRIMARY KEY,
+	user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE cart_item(
+	id SERIAL PRIMARY KEY,
+	cart_id INTEGER REFERENCES cart(id) ON DELETE CASCADE,
+	item_id INTEGER REFERENCES item(id) ON DELETE CASCADE,
+	instrcutions TEXT,
+	quantity INTEGER,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
