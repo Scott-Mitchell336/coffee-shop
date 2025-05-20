@@ -18,6 +18,12 @@ DELETE /api/cart/:user_id/items/:items_id --- this will allow the user to remove
 DELETE /api/cart/:user_id --- this will delete the cart for user_id
 
 
+Create users routes/api
+
+POST /api/auth/register --- this will be used to register new users with email, password
+POST. /api/auth/login. --- this will be used to log the user in with the correct email and password, 
+                        it will return a JWT that will be used to verify correct user for other routes/endpoints
+
 
 
 /// schema
