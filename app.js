@@ -5,7 +5,7 @@ require('dotenv').config();
 
 // Import routes
 const authRoutes = require('./routes/auth');
-// const itemsRoutes = require('./routes/items');
+const itemsRoutes = require('./routes/items');
 // const reviewsRoutes = require('./routes/reviews');
 // const commentsRoutes = require('./routes/comments');
 
@@ -18,7 +18,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/items', itemsRoutes);
+app.use('/api/items', itemsRoutes);
 // app.use('/api/reviews', reviewsRoutes);
 // app.use('/api/comments', commentsRoutes);
 // app.use('/api/users', require('./routes/index'));
