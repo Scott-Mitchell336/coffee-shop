@@ -3,26 +3,37 @@
 Create the routes/api for the products/items
 
 GET /api/items --- this will get all the items available
-GET /api/items/:item_id --- this will get a certain item with item_id
-POST /api/items/. --- this will add a new item, the new items info will be added through the headers and json
-PUT. /api/items/:item_id. --- this will allow the items info to be modified, like price, size, etc.
-DELETE. /api/items/:item_id. --- this will delete an item with item_id
+GET /api/Items/:item_id --- this will get a certain item with item_id
+POST /api/items/ --- this will add a new item, the new items info will be added through the headers and json
+PUT /api/items/:item_id --- this will allow the items info to be modified, like price, size, etc.
+DELETE /api/items/:item_id --- this will delete an item with item_id
 
 
 Create the routes/api for the cart
 
-GET  /api/cart/:user_id   --- this will get all the items in the current cart for the user
-POST  /api/cart/:user_id/items/:item_id.  --- this will add a new item to the cart
-PUT    /api/cart/:user_id/Items/:items_id. --- this will allow the user to modify this item that is in the cart
-DELETE /api/cart/:user_id/items/:items_id --- this will allow the user to remove an item from the cart
-DELETE /api/cart/:user_id --- this will delete the cart for user_id
+GET  /api/carts/:user_id   --- this will get all the items in the current cart for the user
+POST /api/carts/:user_id  --- this will create a cart for the user with user_id,
+								a value of -1 for user_id this will create able
+								cart not assocaited with a user who has an account
+POST  /api/carts/:user_id/items/:item_id  --- this will add a new item to the cart
+PUT    /api/carts/:user_id/items/:item_id --- this will allow the user to modify this item that is in the cart, the
+												user can modify like the instraction and quantity of the item
+GET /api/carts/:user_id/items --- this will get all the items in the cart for the user with user_id
+
+
+DELETE /api/carts/:user_id/items:item_id --- this will allow the user to remove an item from the cart
+DELETE /api/carts/:user_id --- this will delete the cart for user_id
+DELETE /api/carts     --- not sure how to do this, I want to to be able to delete a cart, but it might not be associated
+							as user. It could be a cart that was created by a user who does not want to create
+							an account. I guess I could pass the cart_id in the headers?????
 
 
 Create users routes/api
 
 POST /api/auth/register --- this will be used to register new users with email, password
-POST. /api/auth/login. --- this will be used to log the user in with the correct email and password, 
+POST /api/auth/login --- this will be used to log the user in with the correct email and password, 
                         it will return a JWT that will be used to verify correct user for other routes/endpoints
+GET /api/auth/me   -- this will return the current user						
 
 
 
