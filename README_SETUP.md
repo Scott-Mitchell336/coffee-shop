@@ -1,104 +1,48 @@
-# Coffee Shop Project Setup
+# coffee-shop
 
-This document provides step-by-step instructions for setting up the Coffee Shop project.
-
-## Prerequisites
-
-- Node.js (v14.x or higher)
-- npm (v6.x or higher)
-- PostgreSQL (v12.x or higher)
-
-## Installation Steps
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/Scott-Mitchell336/coffee-shop.git
-cd coffee-shop
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
-```
+
+Make sure these are installed 
 
 Main dependencies include:
 - Express.js - Web framework
 - Prisma - ORM for database operations
 - jsonwebtoken - For JWT authentication
 - bcrypt - For password hashing
+- nodemon - automatically restarts your server when files change
 
-### 3. Set Up Environment Variables
+then in the .env file you will need to modify the DATABASE_URL to use your postgres user name and password. You will also need to make a db in Postico (if you use that). The db name should be "coffee_shop_dev" like I ahve included in the URL below.
 
-Create a `.env` file in the root directory:
+DATABASE_URL="postgresql://username:password@localhost:5432/coffee_shop_dev?schema=public"
+JWT_SECRET = "bequietdonttellanyone"
 
-```
-DATABASE_URL="postgresql://username:password@localhost:5432/coffee_shop?schema=public"
-JWT_SECRET="your-secret-key"
-PORT=3000
-```
+PORT = 3000
 
-Replace `username`, `password` with your PostgreSQL credentials.
+Dont change anything else in this file.
 
-### 4. Set Up Database with Prisma
-
-Generate Prisma client:
+Then you will need to run the commands below to setup Prisma correctly
 
 npm install prisma --save-dev
 npx prisma
 npx prisma init
 npx prisma migrate dev 
-
-```bash
 npx prisma generate
-```
 
-Apply migrations to create database tables:
+Once your done with that, then you will need to add this line to the "scripts" section in your package.json file. (You may not need to do this if the lie is already in the file and  your using this one and not one that you possibaly created)
 
-```bash
-npx prisma migrate dev
-```
+"seed": "node db/seed.js"
 
-### 5. Running the Application
+After your modification it should look like this
 
-Start the server in development mode:
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node db/seed.js"
+  },
 
-```bash
-npm run dev
-```
+"seed": "node db/seed.js"
 
-Or for production:
+Run this command from the main coffee-shop directory
 
-```bash
-npm start
-```
+node db/seed.js
 
-## Project Structure
-
-- `prisma` - Contains Prisma schema and migrations
-- `db` - Database setup files
-- `server` - Server configuration
-- `/api` - API routes for items, cart, and authentication
-
-## API Endpoints
-
-The project implements the following endpoints:
-
-### Items
-- `GET /api/items` - Get all items available
-- `GET /api/items/:item_id` - Get a specific item
-- `POST /api/items` - Add a new item
-- `PUT /api/items/:item_id` - Update an item
-- `DELETE /api/items/:item_id` - Delete an item
-
-### Cart
-- `GET /api/cart/:user_id` - Get user's cart
-- `POST /api/cart/:user_id/items/:item_id` - Add item to cart
-- `PUT /api/cart/:user_id/items/:item_id` - Update cart item
-- `DELETE /api/cart/:user_id/items/:item_id` - Remove item from cart
-- `DELETE /api/cart/:user_id` - Clear user's cart
-
-### Authentication
-- `POST /api/auth/register` - Register new user (requires email, password)
-- `POST /api/auth/login` - Login user (returns JWT for authentication)
+This will populate the db with test data
