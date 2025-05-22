@@ -1,6 +1,6 @@
 
 require('dotenv').config();
-const app = require('./app');
+const app = require('../app');
 
 // Get port from environment variables or use default
 const PORT = process.env.PORT || 3000;
