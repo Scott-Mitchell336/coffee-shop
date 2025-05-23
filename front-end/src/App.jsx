@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
-import Items from './pages/Items';
+import Items from './pages/ItemsPage';
 
 
 function Home() {
