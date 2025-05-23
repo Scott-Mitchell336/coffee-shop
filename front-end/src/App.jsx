@@ -1,28 +1,29 @@
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import Items from './pages/ItemsPage';
+import { Routes, Route } from 'react-router-dom';
 
+import Header from './components/Header';
+import HomePage from './pages/HomePage';
+import ItemsPage from './pages/ItemsPage'; // aka Menu
+import OrderPage from './pages/OrderPage';
+import CartPage from './pages/CartPage'; 
+import LoginPage from './pages/LoginPage'; 
+import RegisterPage from './pages/RegisterPage';
 
-function Home() {
+function App() {
   return (
     <div>
-      <h1>Moon Rock Cafe</h1>
-      <p><Link to="/items">View Menu Items</Link></p>
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/menu" element={<ItemsPage />} />
+        <Route path="/order" element={<OrderPage />} />
+        <Route path="/cart" element={<CartPage />} /> 
+        <Route path="/login" element={<LoginPage />} /> 
+        <Route path="/signup" element={<RegisterPage />} />
+        {/* Add more routes as needed */}
+      </Routes>
     </div>
   );
 }
 
-export default function App() {
-  return (
-    <>
-      <nav>
-        <Link to="/">Home</Link> | <Link to="/items">Menu</Link> | <Link to="/items">Order</Link>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/menu" element={<Items />} />
-      </Routes>
-    </>
-  );
-}
+export default App;
