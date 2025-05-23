@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5173/api'; // Update this to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your actual API base URL
 
 async function request(endpoint, options = {}) {
   const config = {
