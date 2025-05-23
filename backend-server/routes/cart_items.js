@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const prisma = require("../prisma/db"); 
-
+require('dotenv').config();
 
 // POST  /api/carts/:user_id/items/:item_id  --- this will add a new item to the cart
 router.post("/carts/:user_id/items/:item_id", async (req, res) => {

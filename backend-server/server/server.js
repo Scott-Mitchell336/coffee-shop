@@ -1,5 +1,5 @@
 
-require('dotenv').config();
+require('dotenv').config({ path: '../../.env' });
 const app = require('../app');
 
 // Get port from environment variables or use default

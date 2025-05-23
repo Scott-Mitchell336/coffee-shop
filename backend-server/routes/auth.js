@@ -3,6 +3,7 @@ const prisma = require("../prisma/db");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { authenticateToken } = require("../middleware/auth");
+require('dotenv').config();
 
 // POST /api/auth/register - Register a new user
 router.post("/register", async (req, res, next) => {
