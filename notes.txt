@@ -28,7 +28,15 @@ DELETE /api/carts     --- not sure how to do this, I want to to be able to delet
 							an account. I guess I could pass the cart_id in the headers?????
 
 
-Create users routes/api
+GET  /api/users  --- get all the users
+GET  /api/users/:user_id  --- get a specific user with user_id
+POST  /api/users/ --- create a new user, user info will be in the headers like,
+						name, email, password, etc
+PUT  /api/users/:user_id --- this will chaneg suer info for a specific user_id		
+							the user info to change will be in the headers
+DELETE /api/users/:user_id --- delete a specific user with user_id
+
+Create auth routes/api
 
 POST /api/auth/register --- this will be used to register new users with email, password
 POST /api/auth/login --- this will be used to log the user in with the correct email and password, 

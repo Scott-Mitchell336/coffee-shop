@@ -7,6 +7,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const itemsRoutes = require('./routes/items');
 const cartRoutes = require('./routes/cart');
+const users = require('/routes/users');
 const cartItemsRoutes = require('./routes/cart_items');
 
 // Initialize Express app
@@ -19,6 +20,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/items', itemsRoutes);
+app.use('/api/users', users);
 app.use('/api', cartRoutes);
 app.use('/api', cartItemsRoutes);
 
