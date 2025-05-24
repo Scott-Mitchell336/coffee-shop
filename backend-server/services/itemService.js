@@ -20,3 +20,8 @@ async function getItemById(itemId) {
         where: { id: parseInt(itemId) }
     });
   };
+
+  module.exports = {
+    getAllItems,
+    getItemById
+  };

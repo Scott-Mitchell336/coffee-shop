@@ -13,15 +13,6 @@ router.get("/", async (req, res) => {
             return res.status(404).json({ error: "No users found" });
         }
 
-        // Check if users is an array
-        if (!Array.isArray(users)) {
-            return res.status(500).json({ error: "Unexpected response format" });
-        }
-
-        // Check if users is empty
-        if (users.length === 0) {
-            return res.status(404).json({ error: "No users found" });
-        }
         res.status(200).json(users);
     } catch (error) {
         console.error("Error fetching users:", error);
