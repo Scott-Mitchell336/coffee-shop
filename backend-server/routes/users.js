@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const prisma = require("../prisma/db"); 
 require('dotenv').config();
 // Import the user service
 const userService = require('../services/userService');
