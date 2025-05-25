@@ -1,10 +1,13 @@
-const API_BASE_URL = 'http://localhost:5173/api'; // Update this to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000/api'; // <- likely needs to be this
+ // Update this if backend runs on a different port
 
 async function request(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
-      // Add Authorization header here later if needed
+      ...(token && { Authorization: `Bearer ${token}` }),
     },
     ...options,
   };
@@ -26,6 +29,7 @@ async function request(endpoint, options = {}) {
   }
 }
 
+// Public APIs
 export async function getItems() {
   return request('/items');
 }
@@ -34,4 +38,18 @@ export async function getItemById(id) {
   return request(`/items/${id}`);
 }
 
-// add other API functions as needed
+// Auth APIs
+export async function loginUser({ username, password }) {
+  return request('/auth/login', {
+    method: 'POST',
+    body: { username, password },
+  });
+}
+
+export async function registerUser({ username, password }) {
+  return request('/auth/register', {
+    method: 'POST',
+    body: { username, password },
+  });
+}
+
