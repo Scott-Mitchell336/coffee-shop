@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { fetchWrapper } from '../api/fetchWrapper';
+import request from '../api/fetchWrapper';
+
+
 
 const AuthContext = createContext();
 

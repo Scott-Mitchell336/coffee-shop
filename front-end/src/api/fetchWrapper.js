@@ -52,3 +52,6 @@ export async function registerUser({ username, password }) {
   });
 }
 
+export default request;
+
+
