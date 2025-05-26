@@ -9,7 +9,10 @@
   "scripts": {
     "start:frontend": "cd front-end && npm run dev",
     "start:backend": "cd backend-server && npm run dev",
-    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+    "debug:backend": "cd backend-server && nodemon --inspect server/server.js",
+    "debug:frontend": "cd front-end && npm run dev -- --debug",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "debug": "concurrently \"npm run debug:frontend\" \"npm run debug:backend\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

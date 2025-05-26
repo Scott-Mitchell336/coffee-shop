@@ -64,6 +64,7 @@ async function registerUser(req, res, next) {
 // POST /api/auth/login - Login a user
 router.post("/login", async (req, res, next) => {
   try {
+    console.log("Login attempt with:", req.body);
     // Validate user credentials
     const user = await authService.validateUserCredentials(req.body.username, req.body.password);
 

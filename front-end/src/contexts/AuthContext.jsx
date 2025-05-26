@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import fetchWrapper from '../api/fetchWrapper';
+import request from '../api/fetchWrapper';
 
 
 
@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       if (token) {
         try {
-          const data = await fetchWrapper('/api/auth/me', 'GET', token);
+          const data = await request('/api/auth/me', 'GET', token);
           setUser(data);
         } catch (err) {
           console.error('Invalid token or error fetching user', err);
@@ -25,20 +25,21 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, [token]);
 
-  const login = async (credentials) => {
-    console.log('Logging in with credentials:', credentials);
-    const res = await fetchWrapper('/api/auth/login', 'POST', null, credentials);
+  const login = async (username, password) => {
+    console.log('Logging in with credentials:', username);
+    console.log('Password:', password );
+    const res = await request('/api/auth/login', 'POST', null, {username, password});
     localStorage.setItem('token', res.token);
     setToken(res.token);
-    const data = await fetchWrapper('/api/auth/me', 'GET', res.token);
+    const data = await request('/api/auth/me', 'GET', res.token);
     setUser(data);
   };
 
   const register = async (credentials) => {
-    const res = await fetchWrapper('/api/auth/register', 'POST', null, credentials);
+    const res = await request('/api/auth/register', 'POST', null, credentials);
     localStorage.setItem('token', res.token);
     setToken(res.token);
-    const data = await fetchWrapper('/api/auth/me', 'GET', res.token);
+    const data = await request('/api/auth/me', 'GET', res.token);
     setUser(data);
   };
 

@@ -1,7 +1,10 @@
-const API_BASE_URL = 'http://localhost:3000/api'; // Update this to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000'; // Update this to your actual API base URL
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem('token');
+  console.log("request options =", options);
+  console.log("request endpoint =", endpoint);
+  console.log("request token =", token);
 
   const config = {
     headers: {
@@ -10,6 +13,13 @@ async function request(endpoint, options = {}) {
     },
     ...options,
   };
+
+  console.log('Making API request:', {
+    endpoint,
+    options,
+    config,
+  });
+  console.log("config.headers =", config.headers);
 
   if (options.body) {
     config.body = JSON.stringify(options.body);
@@ -39,14 +49,17 @@ export async function getItemById(id) {
 
 // Auth APIs
 export async function loginUser({ username, password }) {
-  return request('/auth/login', {
+  console.log('Logging in with:', { username, password });
+   const result = await request('/api/auth/login', {
     method: 'POST',
     body: { username, password },
   });
+  console.log('Login result:', result);
+  return result.token; // Assuming the response contains a token
 }
 
 export async function registerUser({ username, password, email, }) {
-  return request('/auth/register', {
+  return request('/api/auth/register', {
     method: 'POST',
     body: { username, password, email },
   });

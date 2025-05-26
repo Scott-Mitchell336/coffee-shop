@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+//import { useAuth } from '../contexts/AuthContext';
+import { loginUser } from '../api/fetchWrapper';
 
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  //const { login } = useAuth();
   const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,11 +20,13 @@ const LoginPage = () => {
     setError('');
     try {
       console.log('Attempting to login with:', formData);
-      const token = await login(formData.username, formData.password);
+      // Pass formData object directly to loginUser
+      const token = await loginUser(formData);
       console.log('Login successful, token:', token);
       navigate('/'); // Redirect on successful login
     } catch (err) {
-      setError('Invalid username or password.');
+      //setError('Invalid username or password.');
+      setError(err.message || 'Login failed. Please try again.');
     }
   };
 

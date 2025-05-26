@@ -108,3 +108,11 @@ administrator — this is an administrator. They can register users, employees a
 		create and modify carts for user and employees and administrators. They 
 		can complete carts and delete carts. They can also modify user info and 
 		delete users.
+
+
+
+Start debugging with the "Full Stack" compound configuration:
+	Press F5 in VS Code
+	Select "Full Stack: Frontend + Backend"
+	Set breakpoints in your backend code
+	Option 2: Using Node.js Inspector
