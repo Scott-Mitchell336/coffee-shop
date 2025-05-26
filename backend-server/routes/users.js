@@ -1,11 +1,10 @@
 const router = require("express").Router();
-require('dotenv').config();
-// Import the user service
 const userService = require('../services/userService');
+const { authenticateToken, requireAdmin, canModifyResource } = require('../middleware/auth');
 
-// GET /api/users --- this will get all the users available
-router.get("/", async (req, res) => {
-      try {
+// GET /api/users --- get all users (admin only)
+router.get("/", authenticateToken, requireAdmin, async (req, res) => {
+    try {
         const users = await userService.getAllUsers();
 
         if (!users || users.length === 0) {
@@ -19,16 +18,15 @@ router.get("/", async (req, res) => {
     }
 });
 
-// GET /api/users/:user_id --- this will get a certain user with user_id
-router.get("/:user_id", async (req, res) => {
+// GET /api/users/:userId --- get user by ID (own user or admin)
+router.get("/:userId", authenticateToken, canModifyResource, async (req, res) => {
     try {
-        const user = await userService.getUserById(req.params.user_id);
+        const user = await userService.getUserById(req.params.userId);
 
-        // Check if user is null
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        
+
         res.status(200).json(user);
     } catch (error) {
         console.error("Error fetching user:", error);
@@ -53,39 +51,36 @@ router.post("/", async (req, res) => {
     }
 });
 
-// PUT /api/users/:user_id --- this will allow the users info to be modified, like password, email, etc.
-router.put("/:user_id", async (req, res) => {
+// PUT /api/users/:userId --- update user (own user or admin)
+router.put("/:userId", authenticateToken, canModifyResource, async (req, res) => {
     try {
-        const updatedUser = await userService.updateUser(req.params.user_id, req.body);
-        
-        // Check if updatedUser is null
-        if (!updatedUser) {
-            return res.status(404).json({ error: "User not found" });
+        // Prevent role escalation by non-admins
+        if (req.body.role && req.user.role !== 'administrator') {
+            delete req.body.role;  // Remove role field if not admin
         }
         
-        res.status(200).json(updatedUser);
+        const user = await userService.updateUser(req.params.userId, req.body);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json(user);
     } catch (error) {
         console.error("Error updating user:", error);
         res.status(500).json({ error: "Failed to update user", message: error.message });
     }
 });
 
-// DELETE /api/users/:user_id --- this will delete the user with the user_id
-router.delete("/:user_id", async (req, res) => {
+// DELETE /api/users/:userId --- delete user (admin only)
+router.delete("/:userId", authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const deletedUser = await userService.deleteUser(req.params.user_id);
-        
-        // Check if deletedUser is null
-        if (!deletedUser) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        
-        res.status(200).json(deletedUser);
+        await userService.deleteUser(req.params.userId);
+        res.status(200).json({ message: "User deleted successfully" });
     } catch (error) {
         console.error("Error deleting user:", error);
         res.status(500).json({ error: "Failed to delete user", message: error.message });
     }
-}); 
+});
 
-// Export the router
 module.exports = router;
