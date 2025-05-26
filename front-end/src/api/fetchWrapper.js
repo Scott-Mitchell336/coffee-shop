@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:3000"; // Update this to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000'; // Update this to your actual API base URL
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("token");
@@ -40,11 +40,11 @@ async function request(endpoint, options = {}) {
 
 // Public APIs
 export async function getItems() {
-  return request("/items");
+  return request('/items');
 }
 
 export async function getItemById(id) {
-  return request(`/items/${id}`);
+  return request(`/api/items/${id}`);
 }
 
 // Auth APIs
