@@ -1,5 +1,5 @@
 {
-  "name": "coffee-shop",
+  "name": "coffee-shop-backend",
   "version": "1.0.0",
   "description": "",
   "main": "backend-server/app.js",

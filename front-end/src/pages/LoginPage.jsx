@@ -17,7 +17,9 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      await login(formData.username, formData.password);
+      console.log('Attempting to login with:', formData);
+      const token = await login(formData.username, formData.password);
+      console.log('Login successful, token:', token);
       navigate('/'); // Redirect on successful login
     } catch (err) {
       setError('Invalid username or password.');

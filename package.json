@@ -1,0 +1,17 @@
+{
+  "name": "coffee-shop",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "front-end",
+    "backend-server"
+  ],
+  "scripts": {
+    "start:frontend": "cd front-end && npm run dev",
+    "start:backend": "cd backend-server && npm run dev",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

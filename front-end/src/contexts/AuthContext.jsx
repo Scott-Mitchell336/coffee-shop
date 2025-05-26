@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import request from '../api/fetchWrapper';
+import fetchWrapper from '../api/fetchWrapper';
 
 
 
@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (credentials) => {
+    console.log('Logging in with credentials:', credentials);
     const res = await fetchWrapper('/api/auth/login', 'POST', null, credentials);
     localStorage.setItem('token', res.token);
     setToken(res.token);

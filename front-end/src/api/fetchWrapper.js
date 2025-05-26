@@ -45,10 +45,10 @@ export async function loginUser({ username, password }) {
   });
 }
 
-export async function registerUser({ username, password }) {
+export async function registerUser({ username, password, email, }) {
   return request('/auth/register', {
     method: 'POST',
-    body: { username, password },
+    body: { username, password, email },
   });
 }
 

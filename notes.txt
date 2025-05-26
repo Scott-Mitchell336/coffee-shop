@@ -81,3 +81,30 @@ CREATE TABLE cart_item(
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+Roles
+————
+user,
+employee,
+administrator
+
+user — is the customer and they can Register, Login. They can bring a list
+		 up of all items in the store, look at individual items, create a cart 
+		 for their order, modify a cart with their order by adding items, adding 
+		 quantity of items and remove items and complete the cart by purchasing the 
+		 products. They can also modify their own user info, like Name, email, 
+		 password. Thats really all they can do.
+
+employee — this is an employee. They can login, They can bring a list up of all 
+		items in the store, look at individual items. They can look at 
+		users/customer cart to fulfill the order and they can mark a cart as 
+		complete when the user pays for the items they are purchasing.
+
+administrator — this is an administrator. They can register users, employees and 
+		other administrators. They can bring a list up of all items in the store, 
+		look at individual items, they can modify items info like price, images, 
+		descriptions and name. They can add and delete items also. They can also 
+		create and modify carts for user and employees and administrators. They 
+		can complete carts and delete carts. They can also modify user info and 
+		delete users.
