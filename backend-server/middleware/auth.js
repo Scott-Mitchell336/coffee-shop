@@ -1,6 +1,16 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+// Generate JWT token
+function generateToken(user) {
+  return jwt.sign(
+    { id: user.id, username: user.username, role: user.role }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: '24h' }
+  );
+}
+
+// Authenticate token middleware
 function authenticateToken(req, res, next) {
   // Get the auth header
   const authHeader = req.headers['authorization'];
@@ -31,7 +41,39 @@ function checkUserAuthorization(req, res, next) {
   next();
 }
 
+// Middleware to check if user has admin role
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'administrator') {
+    return res.status(403).json({ error: 'Admin privileges required' });
+  }
+  next();
+}
+
+// Middleware to check if user has employee or admin role
+function requireEmployee(req, res, next) {
+  if (req.user.role !== 'employee' && req.user.role !== 'administrator') {
+    return res.status(403).json({ error: 'Employee privileges required' });
+  }
+  next();
+}
+
+// Middleware to check if user can modify a resource (own resource or admin)
+function canModifyResource(req, res, next) {
+  const resourceUserId = parseInt(req.params.userId);
+  
+  // Allow if user is modifying their own resource or is an admin
+  if (req.user.id === resourceUserId || req.user.role === 'administrator') {
+    return next();
+  }
+  
+  return res.status(403).json({ error: 'Unauthorized to modify this resource' });
+}
+
 module.exports = {
+  generateToken,
   authenticateToken,
-  checkUserAuthorization
+  checkUserAuthorization,
+  requireAdmin,
+  requireEmployee,
+  canModifyResource
 };
