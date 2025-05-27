@@ -69,4 +69,18 @@ export async function registerUser({ username, password, email }) {
   return result.token;
 }
 
+export async function createItem(data) {
+  return request('/items', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+export async function updateItem(id, data) {
+  return request(`/items/${id}`, {
+    method: 'PUT',
+    body: data,
+  });
+}
+
 export default request;

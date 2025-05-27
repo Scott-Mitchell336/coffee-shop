@@ -5,6 +5,8 @@ import PrivateRoute from './components/PrivateRoute';
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import ItemsPage from './pages/ItemsPage'; // aka Menu
+import AddMenuItemPage from './pages/AddMenuItemPage';
+import EditMenuItemPage from './pages/EditMenuItemPage';
 import ItemDetail from './pages/ItemDetail'; // you missed importing this
 import OrderPage from './pages/OrderPage';
 import CartPage from './pages/CartPage'; 
@@ -18,6 +20,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/menu" element={<ItemsPage />} />
+        <Route path="/menu/add" element={<AddMenuItemPage />} />  
+        <Route path="/menu/edit/:itemId" element={<EditMenuItemPage />} />
         <Route path="/item/:id" element={<ItemDetail />} />
         <Route 
           path="/order" 

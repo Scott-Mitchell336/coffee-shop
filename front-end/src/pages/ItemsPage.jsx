@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getItems } from "../api/fetchWrapper";
+import { Link } from 'react-router-dom';
+
 
 
 const ItemsPage = () => {
@@ -17,9 +19,14 @@ const ItemsPage = () => {
     fetchMenu();
   }, []);
 
-  return (
+ return (
     <div>
       <h1>Menu</h1>
+
+      <div>
+        <Link to="/menu/add">+ Add New Item</Link>
+      </div>
+
       {items.length > 0 ? (
         <ul>
           {items.map((item) => (
