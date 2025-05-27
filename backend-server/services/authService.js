@@ -73,7 +73,12 @@ async function validateUserCredentials(username, password) {
     },
   });
 
+  console.log("Validating user credentials for:", username);
+  console.log("User found:", user);
+  console.log("Password provided:", password);
+  // If user not found or password doesn't match, return null
   if (!user || !(await bcrypt.compare(password, user.password))) {
+    console.log("Invalid credentials for user:", username);
     return null;
   }
 

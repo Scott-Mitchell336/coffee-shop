@@ -12,13 +12,25 @@ async function getUserById(userId) {
   });
 }
 
+const bcrypt = require("bcrypt");
+
 async function createUser(userData) {
+  // Hash password if it exists in userData
+  if (userData.password) {
+    userData.password = await bcrypt.hash(userData.password, 10);
+  }
+  
   return await prisma.users.create({
     data: userData
   });
 }
 
 async function updateUser(userId, userData) {
+  // If updating password, hash it first
+  if (userData.password) {
+    userData.password = await bcrypt.hash(userData.password, 10);
+  }
+  
   return await prisma.users.update({
     where: { id: parseInt(userId) },
     data: userData

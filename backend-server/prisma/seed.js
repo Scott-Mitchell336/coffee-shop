@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { PrismaClient } = require('../../generated/prisma');
+const { PrismaClient } = require('../generated/prisma');
 const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
@@ -23,11 +23,11 @@ async function main() {
   const userPromises = [];
   
   // Create 2 administrators
-  for (let i = 1; i <= 2; i++) {
+  for (let i = 1; i <= 1; i++) {
     userPromises.push(
       prisma.users.create({
         data: {
-          username: `admin${i}`,
+          username: `admin`,
           password: hashedPassword,
           email: `admin${i}@coffeeshop.com`,
           role: 'administrator',

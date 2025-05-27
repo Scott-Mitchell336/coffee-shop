@@ -23,6 +23,7 @@ model cart_items {
 model carts {
   id         Int          @id @default(autoincrement())
   user_id    Int?
+  cart_completed Boolean?   @default(false)
   created_at DateTime?    @default(now()) @db.Timestamp(6)
   updated_at DateTime?    @default(now()) @db.Timestamp(6)
   cart_items cart_items[]

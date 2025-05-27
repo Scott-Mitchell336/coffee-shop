@@ -11,11 +11,21 @@ router.post("/register", async (req, res, next) => {
     // If registering staff (employee or admin), require admin privileges
     if (req.body.role === 'employee' || req.body.role === 'administrator') {
       // Authentication and authorization check for staff creation
-      authenticateToken(req, res, async () => {
-        requireAdmin(req, res, async () => {
-          await registerUser(req, res, next);
+      // First check if this is the first administrator being created
+      const usersExist = await authService.findUserByUsername('admin');
+      
+      // If no users exist yet, allow creation of the first administrator without authentication
+      if (!usersExist && req.body.role === 'administrator' && req.body.username === 'admin') {
+        console.log('Creating first administrator account');
+        await registerUser(req, res, next);
+      } else {
+        // For subsequent admin or employee creation, require admin privileges
+        authenticateToken(req, res, async () => {
+          requireAdmin(req, res, async () => {
+            await registerUser(req, res, next);
+          });
         });
-      });
+      }
     } else {
       // For regular user registration - no auth needed
       req.body.role = 'user'; // Force role to be 'user'

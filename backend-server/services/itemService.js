@@ -11,12 +11,22 @@ async function getItemById(itemId) {
   };
 
   async function createItem(itemData) {
+    // Parse the price to a float if it's provided as a string
+    if (itemData.price && typeof itemData.price === 'string') {
+      itemData.price = parseFloat(itemData.price);
+    }
+    
     return await prisma.items.create({
       data: itemData
     });
   }
 
   async function updateItem(itemId, itemData) {
+    // Parse the price to a float if it's provided as a string
+    if (itemData.price && typeof itemData.price === 'string') {
+      itemData.price = parseFloat(itemData.price);
+    }
+    
     return await prisma.items.update({
       where: { id: parseInt(itemId) },
       data: itemData

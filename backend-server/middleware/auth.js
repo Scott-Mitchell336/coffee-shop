@@ -43,6 +43,7 @@ function checkUserAuthorization(req, res, next) {
 
 // Middleware to check if user has admin role
 function requireAdmin(req, res, next) {
+  console.log('Checking admin privileges for user:', req.user);
   if (req.user.role !== 'administrator') {
     return res.status(403).json({ error: 'Admin privileges required' });
   }
