@@ -40,7 +40,7 @@ async function request(endpoint, options = {}) {
 
 // Public APIs
 export async function getItems() {
-  return request('/items');
+  return request('/api/items');
 }
 
 export async function getItemById(id) {
