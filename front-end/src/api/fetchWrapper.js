@@ -1,10 +1,7 @@
-const API_BASE_URL = 'http://localhost:3000'; // Update this to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000'; // Update to your actual API base URL
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("token");
-  console.log("request options =", options);
-  console.log("request endpoint =", endpoint);
-  console.log("request token =", token);
 
   const config = {
     headers: {
@@ -14,26 +11,34 @@ async function request(endpoint, options = {}) {
     ...options,
   };
 
-  console.log("Making API request:", {
-    endpoint,
-    options,
-    config,
-  });
-  console.log("config.headers =", config.headers);
-
   if (options.body) {
     config.body = JSON.stringify(options.body);
   }
 
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "API request failed");
+
+    // Handle 204 No Content (e.g., after DELETE)
+    if (response.status === 204) return null;
+
+    const data = await response.json();
+
+    // Handle unauthorized (token expired or invalid)
+    if (response.status === 401) {
+      console.warn("Token expired or invalid. Logging out.");
+      localStorage.removeItem("token");
+      // Optionally redirect to login:
+      window.location.href = "/login";
+      throw new Error("Session expired. Please log in again.");
     }
-    return response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "API request failed");
+    }
+
+    return data;
   } catch (error) {
-    console.error("API request error:", error);
+    console.error("API request error:", error.message);
     throw error;
   }
 }
@@ -55,8 +60,7 @@ export async function loginUser({ username, password }) {
     body: { username, password },
   });
   localStorage.setItem("token", result.token);
-  console.log("Login result:", result);
-  return result.token; // Assuming the response contains a token
+  return result.token;
 }
 
 export async function registerUser({ username, password, email }) {
@@ -65,22 +69,42 @@ export async function registerUser({ username, password, email }) {
     body: { username, password, email },
   });
   localStorage.setItem("token", result.token);
-  console.log("Register result:", result);
   return result.token;
 }
 
+export async function getCurrentUser() {
+  return request("/api/auth/me");
+}
+
+
+export function logoutUser() {
+  localStorage.removeItem("token");
+}
+
+// Item CRUD APIs
 export async function createItem(data) {
-  return request('/items', {
+  return request('/api/items', {
     method: 'POST',
     body: data,
   });
 }
 
-export async function updateItem(id, data) {
-  return request(`/items/${id}`, {
+// Delete item by ID (admin)
+export async function deleteItem(itemId) {
+  return await request(`/api/items/${itemId}`, { method: 'DELETE' });
+}
+
+// Update item by ID (admin)
+export async function updateItem(itemId, updatedData) {
+  return await request(`/api/items/${itemId}`, {
     method: 'PUT',
-    body: data,
+    body: updatedData, 
   });
 }
 
+
+
 export default request;
+
+
+

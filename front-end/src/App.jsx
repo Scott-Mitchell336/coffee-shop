@@ -21,16 +21,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/menu" element={<ItemsPage />} />
         <Route path="/menu/add" element={<AddMenuItemPage />} />  
-        <Route path="/menu/edit/:itemId" element={<EditMenuItemPage />} />
+        <Route path="/menu/edit/:id" element={<EditMenuItemPage />} />
         <Route path="/item/:id" element={<ItemDetail />} />
-        <Route 
-          path="/order" 
-          element={
-            <PrivateRoute>
-              <OrderPage />
-            </PrivateRoute>
-          } 
-        />
+        <Route path="/order" element={<OrderPage />}/>
         <Route path="/cart" element={<CartPage />} /> 
         <Route path="/login" element={<LoginPage />} /> 
         <Route path="/register" element={<RegisterPage />} />
