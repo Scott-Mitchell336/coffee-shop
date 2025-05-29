@@ -9,6 +9,7 @@ async function main() {
   console.log('Starting seed...');
 
   // Clear existing data
+  await prisma.cart_item_details.deleteMany({});
   await prisma.cart_items.deleteMany({});
   await prisma.carts.deleteMany({});
   await prisma.items.deleteMany({});
@@ -141,18 +142,33 @@ async function main() {
   console.log(`Created ${carts.length} carts`);
 
   // Add items to carts
+  // First, create cart_items for each cart
   const cartItemsData = [];
+  // For simplicity, let's create just one cart_item per cart initially
   carts.forEach(cart => {
-    // Add 1-5 random items to each cart
+    cartItemsData.push({
+      cart_id: cart.id
+    });
+  });
+
+  const cartItems = await Promise.all(
+    cartItemsData.map(data => prisma.cart_items.create({ data }))
+  );
+  console.log(`Created ${cartItems.length} cart items`);
+
+  // Now create cart_item_details that link items to cart_items
+  const cartItemDetailsData = [];
+  cartItems.forEach(cartItem => {
+    // Add 1-5 random items to each cart_item
     const numItems = Math.floor(Math.random() * 5) + 1;
     for (let i = 0; i < numItems; i++) {
       const randomItem = createdItems[Math.floor(Math.random() * createdItems.length)];
       const quantity = Math.floor(Math.random() * 3) + 1;
       
-      // Only add if this exact item isn't already in the cart
-      if (!cartItemsData.some(ci => ci.cart_id === cart.id && ci.item_id === randomItem.id)) {
-        cartItemsData.push({
-          cart_id: cart.id,
+      // Only add if this exact item isn't already in the details
+      if (!cartItemDetailsData.some(cid => cid.cart_item_id === cartItem.id && cid.item_id === randomItem.id)) {
+        cartItemDetailsData.push({
+          cart_item_id: cartItem.id,
           item_id: randomItem.id,
           quantity: quantity,
           instructions: Math.random() > 0.7 ? 'Extra hot' : null // sometimes add instructions
@@ -161,10 +177,10 @@ async function main() {
     }
   });
 
-  const cartItems = await Promise.all(
-    cartItemsData.map(data => prisma.cart_items.create({ data }))
+  const cartItemDetails = await Promise.all(
+    cartItemDetailsData.map(data => prisma.cart_item_details.create({ data }))
   );
-  console.log(`Created ${cartItems.length} cart items`);
+  console.log(`Created ${cartItemDetails.length} cart item details`);
 
   console.log('Seeding completed successfully!');
 }
