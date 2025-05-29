@@ -1,31 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { getItems, getCurrentUser } from "../api/fetchWrapper";
+import { getItems } from "../api/fetchWrapper";
 import { Link, useNavigate } from "react-router-dom";
 
-const ItemsPage = () => {
+const ItemsPage = ({ user }) => {
   const [items, setItems] = useState([]);
-  const [user, setUser] = useState(null);         
-  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingItems, setLoadingItems] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-        console.log("Fetched user:", currentUser);
-      } catch (error) {
-        setUser(null);
-        console.error("Error fetching user:", error);
-      } finally {
-        setLoadingUser(false);
-      }
 
       try {
+        setLoadingItems(true);
         const itemsData = await getItems();
+        console.log("Fetched items:", itemsData);
         setItems(itemsData);
+        setLoadingItems(false);
       } catch (error) {
         console.error("Error fetching items:", error);
+        setLoadingItems(false);
       }
     };
 
@@ -37,7 +30,9 @@ const ItemsPage = () => {
   };
 
   const handleDelete = async (itemId) => {
-    const confirmed = window.confirm("Are you sure you want to delete this item?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this item?"
+    );
     if (!confirmed) return;
 
     try {
@@ -60,14 +55,16 @@ const ItemsPage = () => {
     }
   };
 
-  if (loadingUser) return <p>Loading user info...</p>;
+if (loadingItems) return <p>Loading items...</p>;
 
   const isAdmin = user?.role === "administrator";
+  console.log("Current user:", user);
+  console.log("User role:", user?.role);
+  console.log("Is admin:", isAdmin);
 
   return (
     <div>
       <h1>Menu</h1>
-
       {isAdmin && (
         <div>
           <Link to="/menu/add">+ Add New Item</Link>

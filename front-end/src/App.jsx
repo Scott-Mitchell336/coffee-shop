@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -14,18 +14,21 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
 function App() {
+
+  const [user, setUser] = useState(null);
+
   return (
     <div>
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/menu" element={<ItemsPage />} />
+        <Route path="/menu" element={<ItemsPage user={user} />} />
         <Route path="/menu/add" element={<AddMenuItemPage />} />  
         <Route path="/menu/edit/:id" element={<EditMenuItemPage />} />
         <Route path="/item/:id" element={<ItemDetail />} />
         <Route path="/order" element={<OrderPage />}/>
         <Route path="/cart" element={<CartPage />} /> 
-        <Route path="/login" element={<LoginPage />} /> 
+        <Route path="/login" element={<LoginPage user={user} setUser={setUser}/>} /> 
         <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </div>

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // import { useAuth } from '../contexts/AuthContext';
 import { loginUser, getCurrentUser } from '../api/fetchWrapper';
 
-const LoginPage = () => {
+const LoginPage = ({user, setUser}) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   // const { login } = useAuth();
@@ -22,7 +22,12 @@ const LoginPage = () => {
       console.log('Login successful, token:', token);
 
       // Get current user info
-      const user = await getCurrentUser();
+      user = await getCurrentUser();
+      console.log('Fetched user after login:', user);
+      if (!user) {
+        throw new Error('Failed to fetch user information after login.');
+      };
+      setUser(user);
       console.log('Logged-in user:', user);
 
       // Redirect on successful login
