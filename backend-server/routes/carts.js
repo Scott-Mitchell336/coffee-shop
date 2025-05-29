@@ -136,4 +136,68 @@ router.get("/", authenticateToken, requireAdmin, async (req, res) => {
     }
 });
 
+// POST /api/carts/:user_id/items - Add an item to the cart
+router.post("/:user_id/items", authenticateToken, async (req, res) => {
+  try {
+    // Users can only add items to their own cart unless they're an admin
+    if (req.user.id !== parseInt(req.params.user_id) && req.user.role !== 'administrator') {
+      return res.status(403).json({ error: "Unauthorized to add items to this cart" });
+    }
+
+    const { itemId, quantity, instructions } = req.body;
+    if (!itemId) {
+      return res.status(400).json({ error: "Item ID is required" });
+    }
+
+    const cart = await cartService.addItemToCart(req.params.user_id, {
+      itemId,
+      quantity,
+      instructions
+    });
+
+    res.status(201).json(cart);
+  } catch (error) {
+    console.error("Error adding item to cart:", error);
+    res.status(500).json({ error: "Failed to add item to cart", message: error.message });
+  }
+});
+
+// PUT /api/carts/:user_id/items/:itemDetailId - Update an item in the cart
+router.put("/:user_id/items/:itemDetailId", authenticateToken, async (req, res) => {
+  try {
+    // Users can only update items in their own cart unless they're an admin
+    if (req.user.id !== parseInt(req.params.user_id) && req.user.role !== 'administrator') {
+      return res.status(403).json({ error: "Unauthorized to update items in this cart" });
+    }
+
+    const { quantity, instructions } = req.body;
+    const cart = await cartService.updateCartItem(req.params.user_id, req.params.itemDetailId, {
+      quantity,
+      instructions
+    });
+
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error updating cart item:", error);
+    res.status(500).json({ error: "Failed to update cart item", message: error.message });
+  }
+});
+
+// DELETE /api/carts/:user_id/items/:itemDetailId - Remove an item from the cart
+router.delete("/:user_id/items/:itemDetailId", authenticateToken, async (req, res) => {
+  try {
+    // Users can only remove items from their own cart unless they're an admin
+    if (req.user.id !== parseInt(req.params.user_id) && req.user.role !== 'administrator') {
+      return res.status(403).json({ error: "Unauthorized to remove items from this cart" });
+    }
+
+    const cart = await cartService.removeCartItem(req.params.user_id, req.params.itemDetailId);
+
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error removing cart item:", error);
+    res.status(500).json({ error: "Failed to remove cart item", message: error.message });
+  }
+});
+
 module.exports = router;
