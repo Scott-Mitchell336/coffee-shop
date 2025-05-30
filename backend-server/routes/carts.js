@@ -76,6 +76,8 @@ router.put("/:user_id", authenticateToken, async (req, res) => {
 //                                -1 for user_id will delete the cart not associated with a user
 //                                who has an account, not sure how to handle that but we can
 //                                figure it out later
+// Actually I dont think it will work this way
+
 router.delete("/:user_id", authenticateToken, async (req, res) => {
   try {
     // Users can only delete their own cart unless they're an admin

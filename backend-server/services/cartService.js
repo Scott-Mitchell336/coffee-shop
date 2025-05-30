@@ -4,6 +4,7 @@ async function getCartById(user_id) {
   return await prisma.carts.findFirst({
     where: {
       user_id: parseInt(user_id),
+      cart_completed: false // Only get active (not completed) carts
     },
     include: {
       cart_items: {
@@ -29,9 +30,12 @@ async function createCartWithUserId(userId) {
 }
 
 async function updateCart(userId, cartData) {
-  // First find the cart by user_id
+  // First find the active cart by user_id
   const cart = await prisma.carts.findFirst({
-    where: { user_id: parseInt(userId) }
+    where: { 
+      user_id: parseInt(userId),
+      cart_completed: false
+    }
   });
 
   if (!cart) {
@@ -57,9 +61,12 @@ async function updateCart(userId, cartData) {
 }
 
 async function deleteCart(userId) {
-  // First find the cart by user_id
+  // First find the active cart by user_id
   const cart = await prisma.carts.findFirst({
-    where: { user_id: parseInt(userId) }
+    where: { 
+      user_id: parseInt(userId),
+      cart_completed: false
+    }
   });
 
   if (!cart) {
@@ -113,20 +120,24 @@ async function getCartsByUserId(userId) {
   });
 }
 
-// New function to add an item to a cart
+// add an item to a cart
 async function addItemToCart(userId, itemData) {
   const { itemId, quantity, instructions } = itemData;
 
-  // Find the cart by user_id
-  const cart = await prisma.carts.findFirst({
-    where: { user_id: parseInt(userId) },
+  // Find the active (not completed) cart by user_id
+  let cart = await prisma.carts.findFirst({
+    where: { 
+      user_id: parseInt(userId),
+      cart_completed: false 
+    },
     include: {
       cart_items: true
     }
   });
 
+  // If there's no active cart, create a new one
   if (!cart) {
-    throw new Error("Cart not found");
+    cart = await createCartWithUserId(userId);
   }
 
   // Check if the cart already has a cart_item
@@ -162,9 +173,12 @@ async function addItemToCart(userId, itemData) {
 
 // Function to update an item in the cart
 async function updateCartItem(userId, itemDetailId, updateData) {
-  // Find the cart and make sure it belongs to the user
+  // Find the active cart and make sure it belongs to the user
   const cart = await prisma.carts.findFirst({
-    where: { user_id: parseInt(userId) },
+    where: { 
+      user_id: parseInt(userId),
+      cart_completed: false 
+    },
     include: {
       cart_items: {
         include: {
@@ -209,9 +223,12 @@ async function updateCartItem(userId, itemDetailId, updateData) {
 
 // Function to remove an item from the cart
 async function removeCartItem(userId, itemDetailId) {
-  // Find the cart and make sure it belongs to the user
+  // Find the active cart and make sure it belongs to the user
   const cart = await prisma.carts.findFirst({
-    where: { user_id: parseInt(userId) },
+    where: { 
+      user_id: parseInt(userId),
+      cart_completed: false 
+    },
     include: {
       cart_items: {
         include: {
