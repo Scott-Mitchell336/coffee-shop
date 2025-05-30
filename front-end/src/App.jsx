@@ -8,7 +8,6 @@ import ItemsPage from './pages/ItemsPage'; // aka Menu
 import AddMenuItemPage from './pages/AddMenuItemPage';
 import EditMenuItemPage from './pages/EditMenuItemPage';
 import ItemDetail from './pages/ItemDetail'; // you missed importing this
-import OrderPage from './pages/OrderPage';
 import CartPage from './pages/CartPage'; 
 import LoginPage from './pages/LoginPage'; 
 import RegisterPage from './pages/RegisterPage';
@@ -26,10 +25,9 @@ function App() {
         <Route path="/menu/add" element={<AddMenuItemPage />} />  
         <Route path="/menu/edit/:id" element={<EditMenuItemPage />} />
         <Route path="/item/:id" element={<ItemDetail />} />
-        <Route path="/order" element={<OrderPage />}/>
         <Route path="/cart" element={<CartPage />} /> 
         <Route path="/login" element={<LoginPage user={user} setUser={setUser}/>} /> 
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/signup" element={<RegisterPage />} />
       </Routes>
     </div>
   );

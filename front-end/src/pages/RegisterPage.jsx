@@ -44,7 +44,7 @@ export default function RegisterPage() {
 
   return (
     <div>
-      <h2>Register</h2>
+      <h2>Create an Account</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleSubmit}>
         <label>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
           />
         </label>
         <br />
-        <button type="submit">Register</button>
+        <button type="submit">Sign Me Up</button>
       </form>
     </div>
   );
