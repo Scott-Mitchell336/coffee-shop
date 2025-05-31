@@ -1,4 +1,3 @@
-const API_BASE_URL = 'http://localhost:3000'; // Update to your actual API base URL
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("token");

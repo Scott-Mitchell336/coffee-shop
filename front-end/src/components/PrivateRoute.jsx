@@ -2,15 +2,25 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const PrivateRoute = ({ children }) => {
-  const { user } = useAuth();
+const PrivateRoute = ({ children, requiredRole = null }) => {
+  const { user, loading, isAuthenticated } = useAuth();
 
-  if (!user) {
-    // Not logged in, redirect to login page
+  // Show loading state while checking authentication
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Logged in, render the children component (protected page)
+  // Check for role if specified
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Render the protected component
   return children;
 };
 

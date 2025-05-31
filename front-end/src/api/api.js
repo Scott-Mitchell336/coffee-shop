@@ -1,23 +1,84 @@
-export const getItems = async () => {
-  // Simulate dummy before merging with backend
-  return [
-    {
-      id: 1,
-      name: 'Iced Latte',
-      description: 'Chilled espresso with milk over ice.',
-      price: 4.50,
-    },
-    {
-      id: 2,
-      name: 'Cold Brew',
-      description: 'Smooth, slow-steeped coffee.',
-      price: 3.75,
-    },
-    {
-      id: 3,
-      name: 'Churro Latte',
-      description: 'Espresso with cinnamon and sugar.',
-      price: 5.00,
-    },
-  ];
+// Base API URL - change this when deploying to production
+const API_BASE_URL = 'http://localhost:3000/'; // Update to your actual API base URL
+
+// These functions are designed to be used with the authRequest and publicRequest 
+// functions from AuthContext
+
+// Item CRUD APIs
+export const itemsApi = {
+  // Get all items (public)
+  getItems: async (publicRequest) => {
+    return publicRequest('/items');
+  },
+  
+  // Get item by ID (public)
+  getItemById: async (publicRequest, id) => {
+    return publicRequest(`/items/${id}`);
+  },
+  
+  // Create new item (admin only)
+  createItem: async (authRequest, data) => {
+    return authRequest('/items', 'POST', data);
+  },
+  
+  // Update item (admin only)
+  updateItem: async (authRequest, itemId, data) => {
+    return authRequest(`/items/${itemId}`, 'PUT', data);
+  },
+  
+  // Delete item (admin only)
+  deleteItem: async (authRequest, itemId) => {
+    return authRequest(`/items/${itemId}`, 'DELETE');
+  }
 };
+
+// Cart APIs
+export const cartApi = {
+  // Get user cart
+  getUserCart: async (authRequest, userId) => {
+    return authRequest(`/carts/${userId}`);
+  },
+  
+  // Add item to user cart
+  addItemToCart: async (authRequest, userId, itemData) => {
+    return authRequest(`/carts/${userId}/items`, 'POST', itemData);
+  },
+  
+  // Update cart item
+  updateCartItem: async (authRequest, userId, itemDetailId, updateData) => {
+    return authRequest(`/carts/${userId}/items/${itemDetailId}`, 'PUT', updateData);
+  },
+  
+  // Remove item from cart
+  removeCartItem: async (authRequest, userId, itemDetailId) => {
+    return authRequest(`/carts/${userId}/items/${itemDetailId}`, 'DELETE');
+  },
+  
+  // Guest cart operations
+  createGuestCart: async (publicRequest) => {
+    return publicRequest('/carts/guest', 'POST');
+  },
+  
+  getGuestCart: async (publicRequest, cartId) => {
+    return publicRequest(`/carts/guest/${cartId}`);
+  },
+  
+  addItemToGuestCart: async (publicRequest, cartId, itemData) => {
+    return publicRequest(`/carts/guest/${cartId}/items`, 'POST', itemData);
+  },
+  
+  updateGuestCartItem: async (publicRequest, cartId, itemDetailId, updateData) => {
+    return publicRequest(`/carts/guest/${cartId}/items/${itemDetailId}`, 'PUT', updateData);
+  },
+  
+  removeGuestCartItem: async (publicRequest, cartId, itemDetailId) => {
+    return publicRequest(`/carts/guest/${cartId}/items/${itemDetailId}`, 'DELETE');
+  },
+  
+  transferGuestCart: async (authRequest, guestCartId) => {
+    return authRequest('/carts/transfer', 'POST', { guestCartId });
+  }
+};
+
+export { API_BASE_URL };
+

@@ -76,6 +76,8 @@ router.put("/:user_id", authenticateToken, async (req, res) => {
 //                                -1 for user_id will delete the cart not associated with a user
 //                                who has an account, not sure how to handle that but we can
 //                                figure it out later
+// Actually I dont think it will work this way
+
 router.delete("/:user_id", authenticateToken, async (req, res) => {
   try {
     // Users can only delete their own cart unless they're an admin
@@ -197,6 +199,112 @@ router.delete("/:user_id/items/:itemDetailId", authenticateToken, async (req, re
   } catch (error) {
     console.error("Error removing cart item:", error);
     res.status(500).json({ error: "Failed to remove cart item", message: error.message });
+  }
+});
+
+// GUEST CART ROUTES
+// These routes handle carts for users who are not logged in
+
+// POST /api/carts/guest - Create a cart for guest users
+router.post("/guest", async (req, res) => {
+  try {
+    const cart = await cartService.createGuestCart();
+    res.status(201).json(cart);
+  } catch (error) {
+    console.error("Error creating guest cart:", error);
+    res.status(500).json({ error: "Failed to create guest cart", message: error.message });
+  }
+});
+
+// GET /api/carts/guest/:cart_id - Get a guest cart by its ID
+router.get("/guest/:cart_id", async (req, res) => {
+  try {
+    const cart = await cartService.getGuestCartById(req.params.cart_id);
+    
+    if (!cart) {
+      return res.status(404).json({ error: "Guest cart not found" });
+    }
+    
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error fetching guest cart:", error);
+    res.status(500).json({ error: "Failed to fetch guest cart", message: error.message });
+  }
+});
+
+// POST /api/carts/guest/:cart_id/items - Add an item to a guest cart
+router.post("/guest/:cart_id/items", async (req, res) => {
+  try {
+    const { itemId, quantity, instructions } = req.body;
+    if (!itemId) {
+      return res.status(400).json({ error: "Item ID is required" });
+    }
+
+    const cart = await cartService.addItemToGuestCart(req.params.cart_id, {
+      itemId,
+      quantity,
+      instructions
+    });
+    
+    res.status(201).json(cart);
+  } catch (error) {
+    console.error("Error adding item to guest cart:", error);
+    res.status(500).json({ error: "Failed to add item to guest cart", message: error.message });
+  }
+});
+
+// PUT /api/carts/guest/:cart_id/items/:itemDetailId - Update an item in a guest cart
+router.put("/guest/:cart_id/items/:itemDetailId", async (req, res) => {
+  try {
+    const { quantity, instructions } = req.body;
+    
+    const cart = await cartService.updateGuestCartItem(
+      req.params.cart_id,
+      req.params.itemDetailId,
+      { quantity, instructions }
+    );
+    
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error updating guest cart item:", error);
+    res.status(500).json({ error: "Failed to update guest cart item", message: error.message });
+  }
+});
+
+// DELETE /api/carts/guest/:cart_id/items/:itemDetailId - Remove an item from a guest cart
+router.delete("/guest/:cart_id/items/:itemDetailId", async (req, res) => {
+  try {
+    const cart = await cartService.removeGuestCartItem(
+      req.params.cart_id,
+      req.params.itemDetailId
+    );
+    
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error removing guest cart item:", error);
+    res.status(500).json({ error: "Failed to remove guest cart item", message: error.message });
+  }
+});
+
+// POST /api/carts/transfer - Transfer a guest cart to a user account
+router.post("/transfer", authenticateToken, async (req, res) => {
+  try {
+    const { guestCartId } = req.body;
+    const userId = req.user.id;
+    
+    if (!guestCartId) {
+      return res.status(400).json({ error: "Guest cart ID is required" });
+    }
+    
+    const mergedCart = await cartService.transferGuestCartToUser(guestCartId, userId);
+    
+    res.status(200).json({
+      message: "Guest cart transferred successfully",
+      cart: mergedCart
+    });
+  } catch (error) {
+    console.error("Error transferring guest cart:", error);
+    res.status(500).json({ error: "Failed to transfer guest cart", message: error.message });
   }
 });
 

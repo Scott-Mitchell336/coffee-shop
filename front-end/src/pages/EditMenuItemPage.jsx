@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getItemById, updateItem } from '../api/fetchWrapper';
+//import { getItemById, updateItem } from '../api/fetchWrapper';
+import { useAuth } from '../contexts/AuthContext';
+import { itemsApi } from '../api/api';
 
 const EditMenuItemPage = () => {
+  const { publicRequest, authRequest } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -20,13 +23,14 @@ const EditMenuItemPage = () => {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const item = await getItemById(id);
+        const item = await itemsApi.getItems(publicRequest);
         setFormData({
           name: item.name,
           description: item.description,
           price: item.price,
         });
       } catch (err) {
+        console.error('Error fetching item:', err);
         setError('Failed to load item.');
       } finally {
         setLoading(false);
@@ -71,7 +75,7 @@ const EditMenuItemPage = () => {
     }
 
     try {
-      await updateItem(id, formData);
+      await itemsApi.updateItem(authRequest, id, formData);
       setSuccessMessage('Menu item updated successfully!');
       setTimeout(() => {
         navigate('/menu');

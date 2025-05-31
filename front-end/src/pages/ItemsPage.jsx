@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { getItems } from "../api/fetchWrapper";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from '../contexts/AuthContext';
+// import MenuItem from '../components/MenuItem';
+import { itemsApi } from '../api/api';
 
 const ItemsPage = ({ user }) => {
+  const { publicRequest, authRequest } = useAuth();
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,18 +16,19 @@ const ItemsPage = ({ user }) => {
 
       try {
         setLoadingItems(true);
-        const itemsData = await getItems();
-        console.log("Fetched items:", itemsData);
+        // Use publicRequest since this doesn't need auth
+        const itemsData = await itemsApi.getItems(publicRequest);
         setItems(itemsData);
         setLoadingItems(false);
       } catch (error) {
         console.error("Error fetching items:", error);
+        setError('Failed to load menu items. Please try again later.');
         setLoadingItems(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [publicRequest]);
 
   const handleEdit = (itemId) => {
     navigate(`/menu/edit/${itemId}`);
@@ -36,18 +41,9 @@ const ItemsPage = ({ user }) => {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/items/${itemId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete item");
-      }
-
+      // Use authRequest instead of direct fetch
+      await itemsApi.deleteItem(authRequest, itemId);
+      
       // Remove item from state
       setItems(items.filter((item) => item.id !== itemId));
     } catch (error) {
@@ -55,7 +51,8 @@ const ItemsPage = ({ user }) => {
     }
   };
 
-if (loadingItems) return <p>Loading items...</p>;
+  if (loadingItems) return <p>Loading items...</p>;
+  if (error) return <div className="error">{error}</div>;
 
   const isAdmin = user?.role === "administrator";
   console.log("Current user:", user);

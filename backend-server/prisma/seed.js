@@ -23,7 +23,8 @@ async function main() {
 
   const userPromises = [];
   
-  // Create 2 administrators
+  // Create 1 administrators
+  // this is a special administartor
   for (let i = 1; i <= 1; i++) {
     userPromises.push(
       prisma.users.create({
