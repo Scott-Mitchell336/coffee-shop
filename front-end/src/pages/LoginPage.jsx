@@ -1,78 +1,75 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-// import { useAuth } from '../contexts/AuthContext';
-import { loginUser, getCurrentUser } from '../api/fetchWrapper';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-const LoginPage = ({user, setUser}) => {
-  const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
-  // const { login } = useAuth();
+function LoginPage() {
+  const { login, error: authError, loading } = useAuth();
   const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [formError, setFormError] = useState('');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setCredentials({
+      ...credentials,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setFormError('');
+    
     try {
-      console.log('Attempting to login with:', formData);
-      const token = await loginUser(formData);
-      console.log('Login successful, token:', token);
-
-      // Get current user info
-      user = await getCurrentUser();
-      console.log('Fetched user after login:', user);
-      if (!user) {
-        throw new Error('Failed to fetch user information after login.');
-      };
-      setUser(user);
-      console.log('Logged-in user:', user);
-
-      // Redirect on successful login
-      navigate('/');
+      await login(credentials);
+      navigate('/menu'); // Redirect after successful login
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      setFormError('Invalid username or password');
     }
   };
 
   return (
-    <div>
-      <h1>Welcome!</h1>
-      <p>Login to your account...</p>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
+    <div className="login-page">
+      <h2>Login</h2>
+      {(formError || authError) && (
+        <div className="error">{formError || authError}</div>
+      )}
       <form onSubmit={handleSubmit}>
-        <label>
-          Username:
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
           <input
             type="text"
+            id="username"
             name="username"
-            value={formData.username}
+            value={credentials.username}
             onChange={handleChange}
             required
           />
-        </label>
-        <br />
-
-        <label>
-          Password:
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
           <input
             type="password"
+            id="password"
             name="password"
-            value={formData.password}
+            value={credentials.password}
             onChange={handleChange}
             required
           />
-        </label>
-        <br />
-
-        <button type="submit">Login</button>
+        </div>
+        <button 
+          type="submit" 
+          className="btn btn-primary" 
+          disabled={loading}
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
       </form>
+      <div className="auth-links">
+        <p>Don't have an account? <Link to="/register">Register</Link></p>
+      </div>
     </div>
   );
-};
+}
 
 export default LoginPage;

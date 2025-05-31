@@ -1,4 +1,4 @@
-
+const API_BASE_URL = 'http://localhost:3000/'; // Update to your actual API base URL
 
 Create the routes/api for the products/items
 
@@ -116,3 +116,45 @@ Start debugging with the "Full Stack" compound configuration:
 	Select "Full Stack: Frontend + Backend"
 	Set breakpoints in your backend code
 	Option 2: Using Node.js Inspector
+
+
+
+	import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { itemsApi } from '../api/api';
+
+function ItemsPage() {
+  const { publicRequest, authRequest, user } = useAuth();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        // Use the publicRequest function from AuthContext
+        const data = await itemsApi.getItems(publicRequest);
+        setItems(data);
+      } catch (error) {
+        console.error('Error fetching items:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchItems();
+  }, [publicRequest]);
+
+  const handleDelete = async (itemId) => {
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      try {
+        // Use the authRequest function from AuthContext
+        await itemsApi.deleteItem(authRequest, itemId);
+        setItems(items.filter(item => item.id !== itemId));
+      } catch (error) {
+        console.error('Error deleting item:', error);
+      }
+    }
+  };
+
+  // Rest of the component...
+}

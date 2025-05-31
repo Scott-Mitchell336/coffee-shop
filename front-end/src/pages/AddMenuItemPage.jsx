@@ -1,125 +1,120 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createItem } from '../api/fetchWrapper';
+import { useAuth } from '../contexts/AuthContext';
 
-const AddMenuItemPage = () => {
+function AddMenuItemPage() {
   const navigate = useNavigate();
-
+  const { authRequest } = useAuth(); // Use authRequest for protected routes
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
+    category: '',
+    image_url: ''
   });
-
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: name === 'price' ? parseFloat(value) || '' : value
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.name.trim() || !formData.description.trim()) {
-      return 'Name and description are required.';
-    }
-
-    const priceValue = parseFloat(formData.price);
-    if (isNaN(priceValue) || priceValue <= 0) {
-      return 'Price must be a number greater than 0.';
-    }
-
-    return null;
-  };
-
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccessMessage('');
-    setIsSubmitting(true);
-
-    const validationError = validateForm();
-    if (validationError) {
-      setError(validationError);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      await createItem(formData);
-      setSuccessMessage('Menu item added successfully!');
-      setFormData({ name: '', description: '', price: '' });
-
-      setTimeout(() => {
-        navigate('/menu');
-      }, 1000);
+      // Use authRequest since this needs authentication
+      await authRequest('/items', 'POST', formData);
+      navigate('/menu');
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsSubmitting(false);
+      setError('Failed to add menu item. Please try again.');
+      console.error('Error adding menu item:', err);
     }
-  };
-
-  const handleCancel = () => {
-    navigate('/menu');
   };
 
   return (
-    <div>
-      <h1>Add New Menu Item</h1>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-
+    <div className="add-item-page">
+      <h2>Add New Menu Item</h2>
+      {error && <div className="error">{error}</div>}
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
           <input
             type="text"
+            id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
             required
           />
         </div>
-
-        <div>
-          <label>Description:</label>
+        
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
           <textarea
+            id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             required
-          />
+          ></textarea>
         </div>
-
-        <div>
-          <label>Price:</label>
+        
+        <div className="form-group">
+          <label htmlFor="price">Price</label>
           <input
             type="number"
+            id="price"
             name="price"
             step="0.01"
+            min="0"
             value={formData.price}
             onChange={handleChange}
             required
           />
         </div>
-
-        <div>
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Add Item'}
-          </button>
-          <button type="button" onClick={handleCancel} style={{ marginLeft: '8px' }}>
+        
+        <div className="form-group">
+          <label htmlFor="category">Category</label>
+          <select
+            id="category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Category</option>
+            <option value="coffee">Coffee</option>
+            <option value="tea">Tea</option>
+            <option value="pastry">Pastry</option>
+            <option value="sandwich">Sandwich</option>
+          </select>
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="image_url">Image URL</label>
+          <input
+            type="text"
+            id="image_url"
+            name="image_url"
+            value={formData.image_url}
+            onChange={handleChange}
+          />
+        </div>
+        
+        <div className="form-actions">
+          <button type="button" onClick={() => navigate('/menu')} className="btn btn-secondary">
             Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Add Menu Item
           </button>
         </div>
       </form>
     </div>
   );
-};
+}
 
 export default AddMenuItemPage;

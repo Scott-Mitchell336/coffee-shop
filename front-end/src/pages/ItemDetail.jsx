@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"; 
-import { getItemById } from "../api/fetchWrapper";
+import { useAuth } from '../contexts/AuthContext';
+import { itemsApi } from '../api/api';
 
 const ItemDetail = () => {
+  const { publicRequest } = useAuth();
   const { itemId } = useParams(); // Get itemId from URL
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -11,9 +13,10 @@ const ItemDetail = () => {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const data = await getItemById(itemId);
+        const data = await itemsApi.getItemById(publicRequest, itemId);
         setItem(data);
       } catch (err) {
+        console.error("Error fetching item:", err);
         setError("Failed to load item.");
       } finally {
         setLoading(false);
