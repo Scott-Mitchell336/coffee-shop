@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { itemsApi, cartApi } from "../api/api";
-import { getCartId, saveCartId } from "../utils/cart";
+import { getGuestCartId } from "../utils/cart";
+
+
 
 const ItemDetail = () => {
   const { publicRequest, authRequest, currentUser } = useAuth();
@@ -45,15 +47,15 @@ const ItemDetail = () => {
   }, []);
 
   // Create guest cart if needed, return cartId
-  const createGuestCartIfNeeded = async () => {
-    let cartId = getGuestCartId();
-    if (!cartId) {
-      const newCart = await cartApi.createGuestCart(publicRequest);
-      cartId = newCart.id;
-      saveGuestCartId(cartId);
-    }
-    return cartId;
-  };
+  // const createGuestCartIfNeeded = async () => {
+  //   let cartId = getGuestCartId();
+  //   if (!cartId) {
+  //     const newCart = await cartApi.createGuestCart(publicRequest);
+  //     cartId = newCart.id;
+  //     saveGuestCartId(cartId);
+  //   }
+  //   return cartId;
+  // };
 
   const handleAddToCart = async () => {
     setActionLoading(true);
@@ -67,7 +69,7 @@ const ItemDetail = () => {
         });
       } else {
         // Guest user: use guest cart flow
-        await cartApi.addItemToGuestCart(publicRequest, cartId, {
+        await cartApi.addItemToGuestCart(publicRequest, getGuestCartId(), {
           itemId: item.id,
           quantity: 1,
         });

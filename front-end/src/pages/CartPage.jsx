@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { cartApi, itemsApi } from "../api/api";
-import { getCartId } from "../utils/cart";
+import { cartApi } from "../api/api";
+import { getGuestCartId } from "../utils/cart";
 
 const CartPage = () => {
   const { authRequest, publicRequest, currentUser } = useAuth();
@@ -25,7 +25,7 @@ const CartPage = () => {
           setCartItems(cartData.items || []);
         } else {
           // Fetch guest cart
-          const guestCartId = getCartId();
+          const guestCartId = getGuestCartId();
           if (guestCartId) {
             const guestCart = await cartApi.getGuestCart(publicRequest, guestCartId);
              console.log("Fetched guest cart data:", guestCart);
