@@ -66,7 +66,7 @@ function LoginPage() {
         </button>
       </form>
       <div className="auth-links">
-        <p>Don't have an account? <Link to="/register">Register</Link></p>
+        <p>Don't have an account? <Link to="/register">Sign up</Link></p>
       </div>
     </div>
   );

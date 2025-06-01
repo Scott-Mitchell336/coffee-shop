@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { itemsApi, cartApi } from "../api/api";
+import { getCartId, saveCartId } from "../utils/cart";
 
 const ItemDetail = () => {
   const { publicRequest, authRequest, currentUser } = useAuth();
@@ -11,8 +12,12 @@ const ItemDetail = () => {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false); // for button loading state
+  const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -29,25 +34,46 @@ const ItemDetail = () => {
     fetchItem();
   }, [itemId, publicRequest]);
 
-  if (loading)
-    return <p className="text-center text-gray-600">Loading item details...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
-  if (!item)
-    return <p className="text-center text-gray-600">Item not found.</p>;
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Create guest cart if needed, return cartId
+  const createGuestCartIfNeeded = async () => {
+    let cartId = getCartId();
+    if (!cartId) {
+      const newCart = await cartApi.createGuestCart(publicRequest);
+      cartId = newCart.id;
+      saveCartId(cartId);
+    }
+    return cartId;
+  };
 
   const handleAddToCart = async () => {
-    if (!currentUser) {
-      alert("Please log in to add items to your cart.");
-      return;
-    }
     setActionLoading(true);
     setMessage(null);
     try {
-      await cartApi.addItemToCart(authRequest, currentUser.id, {
-        itemId: item.id,
-        quantity: 1,
-      });
-      setMessage("Item added to cart!");
+      if (currentUser) {
+        // Logged-in user: add item to their cart (using user id)
+        await cartApi.addItemToCart(authRequest, currentUser.id, {
+          itemId: item.id,
+          quantity: 1,
+        });
+      } else {
+        // Guest user: use guest cart flow
+        await cartApi.addItemToGuestCart(publicRequest, cartId, {
+          itemId: item.id,
+          quantity: 1,
+        });
+      }
+      setMessage(null);
+      setShowPrompt(true); // Show checkout/back to menu prompt
     } catch (err) {
       console.error("Add to cart error:", err);
       setMessage("Failed to add item to cart.");
@@ -76,7 +102,23 @@ const ItemDetail = () => {
     navigate(`/items/edit/${item.id}`);
   };
 
+  const handleCheckout = () => {
+    setShowPrompt(false);
+    navigate("/checkout");
+  };
+
+  const handleBackToMenu = () => {
+    setShowPrompt(false);
+    navigate("/items"); // or /menu if that's your route
+  };
+
   const isAdmin = currentUser?.role === "admin";
+
+  if (loading)
+    return <p className="text-center text-gray-600">Loading item details...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (!item)
+    return <p className="text-center text-gray-600">Item not found.</p>;
 
   return (
     <div className="fixed top-10 left-1/2 transform -translate-x-1/2 bg-white p-6 shadow-lg max-w-md w-full rounded-lg z-50">
@@ -108,34 +150,62 @@ const ItemDetail = () => {
       </button>
 
       {isAdmin && (
-        <div className="inline-block relative">
+        <div className="inline-block relative" ref={dropdownRef}>
           <button
+            onClick={() => setShowDropdown((prev) => !prev)}
             disabled={actionLoading}
             className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 font-semibold"
           >
             Modify ▼
           </button>
-          <div className="absolute top-full left-0 bg-white border border-gray-300 rounded-md shadow-md flex flex-col min-w-[120px] z-50">
-            <button
-              onClick={handleEdit}
-              disabled={actionLoading}
-              className="px-4 py-2 text-left hover:bg-gray-100 disabled:text-gray-400 cursor-pointer"
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={actionLoading}
-              className="px-4 py-2 text-left text-red-600 hover:bg-red-100 disabled:text-gray-400 cursor-pointer"
-            >
-              Delete
-            </button>
-          </div>
+          {showDropdown && (
+            <div className="absolute top-full left-0 bg-white border border-gray-300 rounded-md shadow-md flex flex-col min-w-[120px] z-50">
+              <button
+                onClick={handleEdit}
+                disabled={actionLoading}
+                className="px-4 py-2 text-left hover:bg-gray-100 disabled:text-gray-400 cursor-pointer"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={actionLoading}
+                className="px-4 py-2 text-left text-red-600 hover:bg-red-100 disabled:text-gray-400 cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {message && (
-        <p className="mt-4 text-center text-sm text-green-600">{message}</p>
+      {message && !showPrompt && (
+        <p
+          className="mt-4 text-center text-sm text-green-600"
+          aria-live="polite"
+        >
+          {message}
+        </p>
+      )}
+
+      {showPrompt && (
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-300 rounded-md text-center">
+          <p className="mb-4 font-semibold text-blue-700">
+            Item added to cart! What would you like to do next?
+          </p>
+          <button
+            onClick={handleCheckout}
+            className="mr-4 px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-800 font-semibold"
+          >
+            Checkout
+          </button>
+          <button
+            onClick={handleBackToMenu}
+            className="px-4 py-2 rounded-md bg-gray-300 hover:bg-gray-400 font-semibold"
+          >
+            Back to Menu
+          </button>
+        </div>
       )}
     </div>
   );
