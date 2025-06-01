@@ -1,17 +1,18 @@
-const CART_ID_KEY = "cartId";
 
-// Save cartId to localStorage
-export function saveCartId(cartId) {
-  if (!cartId) return;
-  localStorage.setItem(CART_ID_KEY, cartId);
-}
+// Key used to store guest cart ID in localStorage
+const GUEST_CART_KEY = 'guestCartId';
 
-// Get cartId from localStorage
-export function getCartId() {
-  return localStorage.getItem(CART_ID_KEY);
-}
 
-// Remove cartId from localStorage (optional, if you want to clear cart)
-export function clearCartId() {
-  localStorage.removeItem(CART_ID_KEY);
-}
+export const getGuestCartId = () => {
+  return localStorage.getItem(GUEST_CART_KEY);
+};
+
+export const saveGuestCartId = (cartId) => {
+  if (cartId) {
+    localStorage.setItem(GUEST_CART_KEY, cartId);
+  }
+};
+
+export const clearGuestCartId = () => {
+  localStorage.removeItem(GUEST_CART_KEY);
+};

@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import { itemsApi } from '../api/api';
 
-const ItemsPage = ({ user, onAddToCart }) => {
-  const { publicRequest, authRequest } = useAuth();
+// Remove user from props, we'll get it from useAuth() instead
+const ItemsPage = ({ onAddToCart }) => {
+  // Get user from auth context to ensure it's always up-to-date
+  const { publicRequest, authRequest, user } = useAuth();
   const [items, setItems] = useState([]);
-  const [loadingItems, setLoadingItems] = useState(true);
+  const [loadingItems, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -14,7 +16,14 @@ const ItemsPage = ({ user, onAddToCart }) => {
   const [modifyDropdownOpen, setModifyDropdownOpen] = useState(false);
   const modifyDropdownRef = useRef(null);
 
+  // Check if user is admin (will update automatically when user changes)
   const isAdmin = user?.role === "administrator";
+
+  // For debugging - remove in production
+  useEffect(() => {
+    console.log("Current user in ItemsPage:", user);
+    console.log("Is admin:", isAdmin);
+  }, [user, isAdmin]);
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -49,14 +58,14 @@ const ItemsPage = ({ user, onAddToCart }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoadingItems(true);
+        setLoading(true);
         const itemsData = await itemsApi.getItems(publicRequest);
         setItems(itemsData);
-        setLoadingItems(false);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching items:", error);
         setError('Failed to load menu items. Please try again later.');
-        setLoadingItems(false);
+        setLoading(false);
       }
     };
 
@@ -127,11 +136,13 @@ const ItemsPage = ({ user, onAddToCart }) => {
               .map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => setSelectedItem(item)}
-                  className="bg-white shadow rounded-lg p-6 flex flex-col justify-between hover:shadow-lg transition cursor-pointer"
-                  aria-label={`View details for ${item.name}`}
+                  className="bg-white shadow rounded-lg p-6 flex flex-col justify-between hover:shadow-lg transition"
                 >
-                  <div>
+                  <div 
+                    onClick={() => setSelectedItem(item)}
+                    className="cursor-pointer"
+                    aria-label={`View details for ${item.name}`}
+                  >
                     <h3 className="text-xl font-semibold">{item.name}</h3>
                     {item.description && (
                       <p className="mt-2 text-gray-600 text-sm">{item.description}</p>
@@ -139,6 +150,30 @@ const ItemsPage = ({ user, onAddToCart }) => {
                   </div>
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-lg font-bold">${item.price.toFixed(2)}</span>
+                    
+                    {/* Add admin controls here */}
+                    {isAdmin && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(item.id);
+                          }}
+                          className="bg-blue-600 text-white px-2 py-1 text-sm rounded hover:bg-blue-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(item.id);
+                          }}
+                          className="bg-red-600 text-white px-2 py-1 text-sm rounded hover:bg-red-700"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

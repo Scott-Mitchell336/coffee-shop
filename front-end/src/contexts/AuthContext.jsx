@@ -1,5 +1,8 @@
 const API_BASE_URL = "http://localhost:3000";
 
+import { cartApi } from "../api/api";
+import { getGuestCartId, clearGuestCartId } from "../utils/cart";
+
 import React, {
   createContext,
   useState,
@@ -20,40 +23,56 @@ export const AuthProvider = ({ children }) => {
   const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
   // Function to handle API requests with optional auth
-  const apiRequest = async (
-    endpoint,
-    method = "GET",
-    token = null,
-    body = null
-  ) => {
-    try {
-      const headers = {
-        "Content-Type": "application/json",
-      };
+  const apiRequest = useCallback(
+    async (endpoint, method = "GET", token = null, body = null) => {
+      try {
+        const headers = {
+          "Content-Type": "application/json",
+        };
 
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const options = { method, headers };
+
+        if (body && (method === "POST" || method === "PUT")) {
+          options.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(`/api${endpoint}`, options);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Request failed");
+        }
+
+        return await response.json();
+      } catch (error) {
+        console.error(`API Error (${endpoint}):`, error);
+        throw error;
       }
+    },
+    []
+  );
 
-      const options = { method, headers };
+  const getToken = useCallback(() => localStorage.getItem("token"), []);
 
-      if (body && (method === "POST" || method === "PUT")) {
-        options.body = JSON.stringify(body);
-      }
+  const authRequest = useCallback(
+    async (endpoint, method = "GET", body = null) => {
+      const token = getToken();
+      if (!token) throw new Error("Authentication required");
+      return await apiRequest(endpoint, method, token, body);
+    },
+    [apiRequest, getToken]
+  );
 
-      const response = await fetch(`/api${endpoint}`, options);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Request failed");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error(`API Error (${endpoint}):`, error);
-      throw error;
-    }
-  };
+  const publicRequest = useCallback(
+    async (endpoint, method = "GET", body = null) => {
+      return await apiRequest(endpoint, method, null, body);
+    },
+    [apiRequest]
+  );
 
   // Logout function
   const logout = useCallback(() => {
@@ -74,6 +93,7 @@ export const AuthProvider = ({ children }) => {
     if (user) startIdleTimer();
   }, [user, startIdleTimer]);
 
+  // Event listeners for activity tracking
   useEffect(() => {
     const events = ["mousemove", "keydown", "mousedown", "touchstart"];
     events.forEach((event) => window.addEventListener(event, resetIdleTimer));
@@ -85,6 +105,10 @@ export const AuthProvider = ({ children }) => {
       clearTimeout(idleTimer.current);
     };
   }, [resetIdleTimer]);
+
+  // Wrap transferGuestCart in useCallback with proper dependencies
+  // First create a reference to the function to fix the circular dependency
+  const transferGuestCartRef = useRef(null);
 
   // Check auth status once on mount
   useEffect(() => {
@@ -99,6 +123,12 @@ export const AuthProvider = ({ children }) => {
         const userData = await apiRequest("/auth/me", "GET", token);
         setUser(userData);
         startIdleTimer();
+
+        // Optional: Now that we have user data, we could call transferGuestCart
+        // But only if the function is defined
+        if (transferGuestCartRef.current) {
+          transferGuestCartRef.current();
+        }
       } catch (err) {
         console.error("Authentication check failed:", err);
         localStorage.removeItem("token");
@@ -109,65 +139,87 @@ export const AuthProvider = ({ children }) => {
     };
 
     checkAuthStatus();
-  }, [startIdleTimer]);
+  }, [apiRequest, startIdleTimer]);
 
-  const login = async (credentials) => {
-    setLoading(true);
-    try {
-      const response = await apiRequest(
-        "/auth/login",
-        "POST",
-        null,
-        credentials
-      );
-      localStorage.setItem("token", response.token);
-      setUser(response.user);
-      setError(null);
-      startIdleTimer();
-      return response.user;
-    } catch (err) {
-      setError("Login failed. Please check your credentials.");
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const register = async (userData) => {
-    setLoading(true);
-    try {
-      const response = await apiRequest(
-        "/auth/register",
-        "POST",
-        null,
-        userData
-      );
-      if (response.token) {
-        localStorage.setItem("token", response.token);
-        setUser(response.user);
-        startIdleTimer();
+  // Define transferGuestCart and store in ref to avoid circular dependency
+  const transferGuestCart = useCallback(async () => {
+    const guestCartId = getGuestCartId();
+    if (guestCartId && user) {
+      try {
+        await cartApi.transferGuestCart(authRequest, guestCartId);
+        // Clear the guest cart ID after transfer
+        clearGuestCartId();
+      } catch (error) {
+        console.error("Failed to transfer guest cart:", error);
       }
-      setError(null);
-      return response;
-    } catch (err) {
-      setError("Registration failed.");
-      throw err;
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user, authRequest]);
 
-  const getToken = () => localStorage.getItem("token");
+  // Store the latest version of transferGuestCart in the ref
+  transferGuestCartRef.current = transferGuestCart;
 
-  const authRequest = async (endpoint, method = "GET", body = null) => {
-    const token = getToken();
-    if (!token) throw new Error("Authentication required");
-    return await apiRequest(endpoint, method, token, body);
-  };
+  // Use the function in a separate useEffect
+  useEffect(() => {
+    if (user) {
+      transferGuestCart();
+    }
+  }, [user, transferGuestCart]);
 
-  const publicRequest = async (endpoint, method = "GET", body = null) => {
-    return await apiRequest(endpoint, method, null, body);
-  };
+  // Login and register functions
+  const login = useCallback(
+    async (credentials) => {
+      setLoading(true);
+      try {
+        const response = await apiRequest(
+          "/auth/login",
+          "POST",
+          null,
+          credentials
+        );
+        localStorage.setItem("token", response.token);
+
+        // After getting token, fetch the user data
+        const userData = await apiRequest("/auth/me", "GET", response.token);
+        setUser(userData);
+        setError(null);
+        startIdleTimer();
+        return userData;
+      } catch (err) {
+        setError("Login failed. Please check your credentials.");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [apiRequest, startIdleTimer]
+  );
+
+  const register = useCallback(
+    async (userData) => {
+      setLoading(true);
+      try {
+        const response = await apiRequest(
+          "/auth/register",
+          "POST",
+          null,
+          userData
+        );
+        if (response.token) {
+          localStorage.setItem("token", response.token);
+          setUser(response.user);
+          startIdleTimer();
+        }
+        setError(null);
+        return response;
+      } catch (err) {
+        setError("Registration failed.");
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [apiRequest, startIdleTimer]
+  );
 
   const value = {
     user,

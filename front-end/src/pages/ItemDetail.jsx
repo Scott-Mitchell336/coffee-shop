@@ -46,11 +46,11 @@ const ItemDetail = () => {
 
   // Create guest cart if needed, return cartId
   const createGuestCartIfNeeded = async () => {
-    let cartId = getCartId();
+    let cartId = getGuestCartId();
     if (!cartId) {
       const newCart = await cartApi.createGuestCart(publicRequest);
       cartId = newCart.id;
-      saveCartId(cartId);
+      saveGuestCartId(cartId);
     }
     return cartId;
   };

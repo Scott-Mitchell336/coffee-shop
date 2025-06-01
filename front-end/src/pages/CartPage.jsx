@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { cartApi, itemsApi } from "../api/api";
+import { getCartId } from "../utils/cart";
 
 const CartPage = () => {
-  const { authRequest, currentUser } = useAuth();
+  const { authRequest, publicRequest, currentUser } = useAuth();
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,18 +14,24 @@ const CartPage = () => {
 
   // Fetch the user's cart items on mount
   useEffect(() => {
-    if (!currentUser) {
-      setError("Please log in to view your cart.");
-      setLoading(false);
-      return;
-    }
-
     const fetchCart = async () => {
       try {
         setLoading(true);
-        // Assuming cartApi.getCart returns { items: [{ itemId, quantity, item: { ... } }] }
-        const cartData = await cartApi.getCart(authRequest, currentUser.id);
-        setCartItems(cartData.items || []);
+
+        if (currentUser) {
+          // Fetch authenticated user cart
+          const cartData = await cartApi.getUserCart(authRequest, currentUser.id);
+          console.log("Fetched cart data:", cartData);
+          setCartItems(cartData.items || []);
+        } else {
+          // Fetch guest cart
+          const guestCartId = getCartId();
+          if (guestCartId) {
+            const guestCart = await cartApi.getGuestCart(publicRequest, guestCartId);
+             console.log("Fetched guest cart data:", guestCart);
+            setCartItems(guestCart.items || []);
+          }
+        }
       } catch (err) {
         console.error("Failed to fetch cart:", err);
         setError("Failed to load cart.");
@@ -34,7 +41,7 @@ const CartPage = () => {
     };
 
     fetchCart();
-  }, [authRequest, currentUser]);
+  }, [authRequest, publicRequest, currentUser]);
 
   // Calculate total price
   const totalPrice = cartItems.reduce(

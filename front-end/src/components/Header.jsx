@@ -1,22 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
-  const { user, logout } = useAuth();
-  console.log('Header user:', user);
+  const { user, logout } = useAuth(); // Correctly use 'user' from context
+  const location = useLocation();
+  
+  // Debug: Log when the component rerenders and what the user state is
+  useEffect(() => {
+    console.log('Header rendered with user:', user);
+  }, [user]);
 
   return (
     <nav style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
       <ul style={{ listStyle: 'none', display: 'flex', gap: '1rem', alignItems: 'center', margin: 0, padding: 0 }}>
         <li><Link to="/">Home</Link></li>
         <li><Link to="/menu">Menu</Link></li>
+        
         {user ? (
+          // User is logged in
           <>
             <li style={{ marginLeft: 'auto' }}>Hello, {user.username}!</li>
             <li>
               <button 
-                onClick={logout} 
+                onClick={() => {
+                  logout();
+                }} 
                 style={{ 
                   cursor: 'pointer', 
                   padding: '0.3rem 0.7rem', 
@@ -32,6 +41,7 @@ const Header = () => {
             </li>
           </>
         ) : (
+          // User is not logged in
           <>
             <li style={{ marginLeft: 'auto' }}><Link to="/login">Login</Link></li>
             <li><Link to="/register">Sign Up</Link></li>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { registerUser } from '../api/fetchWrapper'; // your API helper
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function RegisterPage() {
+  const { register } = useAuth();
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -34,7 +36,7 @@ export default function RegisterPage() {
     }
 
     try {
-      await registerUser(formData);
+      await register(formData);
       alert('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {

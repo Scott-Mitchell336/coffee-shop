@@ -20,8 +20,9 @@ function LoginPage() {
     setFormError('');
     
     try {
-      await login(credentials);
-      navigate('/menu'); // Redirect after successful login
+      const user = await login(credentials);
+      console.log("Login successful! User:", user);
+      navigate('/'); // Redirect after successful login
     } catch (err) {
       console.error('Login error:', err);
       setFormError('Invalid username or password');
