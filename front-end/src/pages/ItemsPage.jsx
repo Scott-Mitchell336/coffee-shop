@@ -136,13 +136,10 @@ const ItemsPage = ({ onAddToCart }) => {
               .map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white shadow rounded-lg p-6 flex flex-col justify-between hover:shadow-lg transition"
+                  onClick={() => setSelectedItem(item)}
+                  className="bg-white shadow rounded-lg p-6 flex flex-col justify-between hover:shadow-lg transition cursor-pointer"
                 >
-                  <div 
-                    onClick={() => setSelectedItem(item)}
-                    className="cursor-pointer"
-                    aria-label={`View details for ${item.name}`}
-                  >
+                  <div>
                     <h3 className="text-xl font-semibold">{item.name}</h3>
                     {item.description && (
                       <p className="mt-2 text-gray-600 text-sm">{item.description}</p>
