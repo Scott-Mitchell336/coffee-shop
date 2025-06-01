@@ -104,6 +104,3 @@ export async function updateItem(itemId, updatedData) {
 
 
 export default request;
-
-
-
