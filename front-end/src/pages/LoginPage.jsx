@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 function LoginPage() {
-  const { login, error: authError, loading } = useAuth();
+  const { login, loading, setUser} = useAuth();
   const navigate = useNavigate();
+  //const { useCart } = useCart();
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [formError, setFormError] = useState('');
+
+  // Get the cart context with a null check
+  const cart = useCart();
+  const transferGuestCartToUser = cart?.transferGuestCartToUser;
 
   const handleChange = (e) => {
     setCredentials({
@@ -15,25 +21,33 @@ function LoginPage() {
     });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
-    
+    console.log("handleSubmit called");
+      
     try {
-      const user = await login(credentials);
-      console.log("Login successful! User:", user);
-      navigate('/'); // Redirect after successful login
+      const data = await login(credentials);
+      console.log("data = ", data);
+
+      
+      // Transfer any guest cart to the user's account
+      await transferGuestCartToUser();
+      
+      console.log("naviagting to /menu");
+      navigate('/menu');
     } catch (err) {
-      console.error('Login error:', err);
       setFormError('Invalid username or password');
+      console.error('Login error:', err);
     }
   };
 
   return (
     <div className="login-page">
       <h2>Login</h2>
-      {(formError || authError) && (
-        <div className="error">{formError || authError}</div>
+      {(formError || formError) && (
+        <div className="error">{formError || formError}</div>
       )}
       <form onSubmit={handleSubmit}>
         <div className="form-group">

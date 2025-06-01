@@ -2,6 +2,7 @@ const API_BASE_URL = "http://localhost:3000";
 
 import { cartApi } from "../api/api";
 import { getGuestCartId, clearGuestCartId } from "../utils/cart";
+import { useNavigate, Link } from 'react-router-dom';
 
 import React, {
   createContext,
@@ -17,8 +18,9 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [authError, setAuthError] = useState(null);
   const idleTimer = useRef(null);
+  const navigate = useNavigate();
 
   const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     clearTimeout(idleTimer.current);
+    navigate('/');
     console.log("Logged out due to inactivity or user action");
   }, []);
 
@@ -132,7 +135,7 @@ export const AuthProvider = ({ children }) => {
       } catch (err) {
         console.error("Authentication check failed:", err);
         localStorage.removeItem("token");
-        setError("Authentication failed");
+        setAuthError("Authentication failed");
       } finally {
         setLoading(false);
       }
@@ -168,6 +171,7 @@ export const AuthProvider = ({ children }) => {
   // Login and register functions
   const login = useCallback(
     async (credentials) => {
+      console.log("login called with credentials:", credentials);
       setLoading(true);
       try {
         const response = await apiRequest(
@@ -177,15 +181,16 @@ export const AuthProvider = ({ children }) => {
           credentials
         );
         localStorage.setItem("token", response.token);
-
+        console.log("response = ", response);
         // After getting token, fetch the user data
         const userData = await apiRequest("/auth/me", "GET", response.token);
+        console.log("userData = ", userData);
         setUser(userData);
-        setError(null);
+        setAuthError(null);
         startIdleTimer();
         return userData;
       } catch (err) {
-        setError("Login failed. Please check your credentials.");
+        setAuthError("Login failed. Please check your credentials.");
         throw err;
       } finally {
         setLoading(false);
@@ -209,10 +214,10 @@ export const AuthProvider = ({ children }) => {
           setUser(response.user);
           startIdleTimer();
         }
-        setError(null);
+        setAuthError(null);
         return response;
       } catch (err) {
-        setError("Registration failed.");
+        setAuthError("Registration failed.");
         throw err;
       } finally {
         setLoading(false);
@@ -224,7 +229,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
-    error,
+    authError,
     login,
     logout,
     register,

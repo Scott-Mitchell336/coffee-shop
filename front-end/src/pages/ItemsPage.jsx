@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext'; // Import useCart hook
 import { itemsApi } from '../api/api';
 
-// Remove user from props, we'll get it from useAuth() instead
-const ItemsPage = ({ onAddToCart }) => {
+const ItemsPage = () => { // Remove onAddToCart prop
   // Get user from auth context to ensure it's always up-to-date
   const { publicRequest, authRequest, user } = useAuth();
+  const { addItemToCart } = useCart(); // Use the cart context
   const [items, setItems] = useState([]);
   const [loadingItems, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false); // For tracking add to cart state
   const navigate = useNavigate();
 
   const [selectedItem, setSelectedItem] = useState(null);
@@ -92,11 +94,19 @@ const ItemsPage = ({ onAddToCart }) => {
     }
   };
 
-  const handleAddToCart = (item) => {
-    if (onAddToCart) {
-      onAddToCart(item);
-    } else {
-      alert(`Added ${item.name} to cart! (Add your cart logic here)`);
+  // Update handleAddToCart to use CartContext
+  const handleAddToCart = async (item) => {
+    try {
+      setActionLoading(true);
+      await addItemToCart(item.id, 1);
+      // Show success feedback
+      alert(`${item.name} added to cart!`);
+      closeModal(); // Close the modal after adding to cart
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      alert(`Failed to add ${item.name} to cart. Please try again.`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -210,9 +220,11 @@ const ItemsPage = ({ onAddToCart }) => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => handleAddToCart(selectedItem)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+                disabled={actionLoading}
+                className={`bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition
+                  ${actionLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Add to Cart
+                {actionLoading ? 'Adding...' : 'Add to Cart'}
               </button>
 
               {isAdmin && (

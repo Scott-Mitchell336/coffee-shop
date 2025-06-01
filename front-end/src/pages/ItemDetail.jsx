@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { itemsApi, cartApi } from "../api/api";
-import { getGuestCartId } from "../utils/cart";
-
-
+import { useCart } from "../contexts/CartContext"; // Import useCart
+import { itemsApi } from "../api/api";
+// Remove imports for cart.js utilities since we'll use CartContext
 
 const ItemDetail = () => {
-  const { publicRequest, authRequest, currentUser } = useAuth();
+  const { publicRequest, authRequest, user } = useAuth();
+  const { addItemToCart } = useCart(); // Use CartContext
   const { itemId } = useParams();
   const navigate = useNavigate();
 
@@ -57,23 +57,14 @@ const ItemDetail = () => {
   //   return cartId;
   // };
 
+  // Update handleAddToCart to use CartContext
   const handleAddToCart = async () => {
     setActionLoading(true);
     setMessage(null);
+    console.log("handleAddToCart called");
     try {
-      if (currentUser) {
-        // Logged-in user: add item to their cart (using user id)
-        await cartApi.addItemToCart(authRequest, currentUser.id, {
-          itemId: item.id,
-          quantity: 1,
-        });
-      } else {
-        // Guest user: use guest cart flow
-        await cartApi.addItemToGuestCart(publicRequest, getGuestCartId(), {
-          itemId: item.id,
-          quantity: 1,
-        });
-      }
+      // Use the addItemToCart function from CartContext
+      await addItemToCart(item.id, 1);
       setMessage(null);
       setShowPrompt(true); // Show checkout/back to menu prompt
     } catch (err) {
@@ -114,7 +105,7 @@ const ItemDetail = () => {
     navigate("/items"); // or /menu if that's your route
   };
 
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = user?.role === "admin";
 
   if (loading)
     return <p className="text-center text-gray-600">Loading item details...</p>;
