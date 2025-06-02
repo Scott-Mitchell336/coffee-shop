@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:3000";
 
 import { cartApi } from "../api/api";
 import { getGuestCartId, clearGuestCartId } from "../utils/cart";
-import { useNavigate, Link } from 'react-router-dom';
+//import { useNavigate, Link } from 'react-router-dom';
 
 import React, {
   createContext,
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
   const idleTimer = useRef(null);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
@@ -81,7 +81,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     clearTimeout(idleTimer.current);
-    navigate('/');
+    //navigate('/');
+    window.location.href = '/';
     console.log("Logged out due to inactivity or user action");
   }, []);
 
