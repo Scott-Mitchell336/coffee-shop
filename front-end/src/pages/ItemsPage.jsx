@@ -4,8 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext'; // Import useCart hook
 import { itemsApi } from '../api/api';
 
-// Remove user from props, we'll get it from useAuth() instead
-const ItemsPage = ({ onAddToCart }) => {
+const ItemsPage = () => { // Remove onAddToCart prop
   // Get user from auth context to ensure it's always up-to-date
   const { publicRequest, authRequest, user } = useAuth();
   const { addItemToCart } = useCart(); // Use the cart context
@@ -250,9 +249,11 @@ const ItemsPage = ({ onAddToCart }) => {
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => handleAddToCart(selectedItem)}
-                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+                disabled={actionLoading}
+                className={`bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition
+                  ${actionLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                Add to Cart
+                {actionLoading ? 'Adding...' : 'Add to Cart'}
               </button>
 
                 {isAdmin && (

@@ -4,15 +4,15 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
 import PrivateRoute from "./components/PrivateRoute";
 
-import Header from './components/Header';
-import HomePage from './pages/HomePage';
-import ItemsPage from './pages/ItemsPage';
-import AddMenuItemPage from './pages/AddMenuItemPage';
-import EditMenuItemPage from './pages/EditMenuItemPage';
-import ItemDetail from './pages/ItemDetail';
-import CartPage from './pages/CartPage'; 
-import LoginPage from './pages/LoginPage'; 
-import RegisterPage from './pages/RegisterPage';
+import Header from "./components/Header";
+import HomePage from "./pages/HomePage";
+import ItemsPage from "./pages/ItemsPage";
+import AddMenuItemPage from "./pages/AddMenuItemPage";
+import EditMenuItemPage from "./pages/EditMenuItemPage";
+import ItemDetail from "./pages/ItemDetail";
+import CartPage from "./pages/CartPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
