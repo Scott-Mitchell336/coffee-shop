@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:3000";
 
 import { cartApi } from "../api/api";
 import { getGuestCartId, clearGuestCartId } from "../utils/cart";
-//import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import React, {
   createContext,

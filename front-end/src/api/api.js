@@ -1,5 +1,5 @@
 // Base API URL - change this when deploying to production
-const API_BASE_URL = 'http://localhost:3000/'; // Update to your actual API base URL
+const API_BASE_URL = 'http://localhost:3000/'; 
 
 // These functions are designed to be used with the authRequest and publicRequest 
 // functions from AuthContext
