@@ -58,7 +58,11 @@ export const CartProvider = ({ children }) => {
 
   // Add item to cart
   const addItemToCart = async (itemId, quantity = 1, instructions = '') => {
+    
+    console.log("addItemToCart called with:", { itemId, quantity, instructions });
     try {
+      console.log("Adding item to cart:", { itemId, quantity, instructions });
+      console.log("Current user:", user);
       if (user) {
         // Logged-in user
         const updatedCart = await cartApi.addItemToCart(
@@ -71,6 +75,7 @@ export const CartProvider = ({ children }) => {
       } else {
         // Guest user
         let guestCartId = localStorage.getItem('guestCartId');
+        console.log("Guest cart ID:", guestCartId);
         
         if (!guestCartId) {
           // Create a new guest cart if none exists

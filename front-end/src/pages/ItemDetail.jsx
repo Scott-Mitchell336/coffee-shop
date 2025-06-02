@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext"; // Import useCart
 import { itemsApi } from "../api/api";
+import { cartApi } from "../api/api"; // Import cartApi for guest cart management
+import { getGuestCartId, saveGuestCartId } from "../utils/cart";
 // Remove imports for cart.js utilities since we'll use CartContext
 
 const ItemDetail = () => {
@@ -47,21 +49,27 @@ const ItemDetail = () => {
   }, []);
 
   // Create guest cart if needed, return cartId
-  // const createGuestCartIfNeeded = async () => {
-  //   let cartId = getGuestCartId();
-  //   if (!cartId) {
-  //     const newCart = await cartApi.createGuestCart(publicRequest);
-  //     cartId = newCart.id;
-  //     saveGuestCartId(cartId);
-  //   }
-  //   return cartId;
-  // };
+  const createGuestCartIfNeeded = async () => {
+    let cartId = getGuestCartId();
+    if (!cartId) {
+      const newCart = await cartApi.createGuestCart(publicRequest);
+      cartId = newCart.id;
+      saveGuestCartId(cartId);
+    }
+    return cartId;
+  };
 
   // Update handleAddToCart to use CartContext
   const handleAddToCart = async () => {
     setActionLoading(true);
     setMessage(null);
     console.log("handleAddToCart called");
+    console.log("Current user:", user);
+    console.log("Guest cart ID:", getGuestCartId());
+    if (!user && !getGuestCartId()) {
+      console.log("Creating guest cart...");
+      createGuestCartIfNeeded();
+    }
     try {
       // Use the addItemToCart function from CartContext
       await addItemToCart(item.id, 1);

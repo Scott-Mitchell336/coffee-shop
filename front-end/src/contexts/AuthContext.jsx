@@ -27,6 +27,7 @@ export const AuthProvider = ({ children }) => {
   // Function to handle API requests with optional auth
   const apiRequest = useCallback(
     async (endpoint, method = "GET", token = null, body = null) => {
+      console.log(`API Request: ${method} ${endpoint}`, { token, body });
       try {
         const headers = {
           "Content-Type": "application/json",
@@ -42,7 +43,9 @@ export const AuthProvider = ({ children }) => {
           options.body = JSON.stringify(body);
         }
 
-        const response = await fetch(`/api${endpoint}`, options);
+        console.log(`Making request to: ${API_BASE_URL}/api${endpoint}`);
+        const url = `${API_BASE_URL}/api${endpoint}`;
+        const response = await fetch(url, options);
 
         if (!response.ok) {
           const errorData = await response.json();
