@@ -12,6 +12,8 @@ import ItemDetail from './pages/ItemDetail';
 import CartPage from './pages/CartPage'; 
 import LoginPage from './pages/LoginPage'; 
 import RegisterPage from './pages/RegisterPage';
+import "./index.css";
+import "./App.css";
 
 function App() {
   return (

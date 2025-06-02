@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { itemsApi, cartApi } from "../api/api";
-import { getGuestCartId } from "../utils/cart";
+import { getGuestCartId, saveGuestCartId } from "../utils/cart";
 
 
 
@@ -46,43 +46,43 @@ const ItemDetail = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Create guest cart if needed, return cartId
-  // const createGuestCartIfNeeded = async () => {
-  //   let cartId = getGuestCartId();
-  //   if (!cartId) {
-  //     const newCart = await cartApi.createGuestCart(publicRequest);
-  //     cartId = newCart.id;
-  //     saveGuestCartId(cartId);
-  //   }
-  //   return cartId;
-  // };
+const createGuestCartIfNeeded = async () => {
+  let cartId = getGuestCartId();
+  if (!cartId) {
+    const newCart = await cartApi.createGuestCart(publicRequest);
+    cartId = newCart.id;
+    saveGuestCartId(cartId); // <== this is critical
+  }
+  return cartId;
+};
 
-  const handleAddToCart = async () => {
-    setActionLoading(true);
-    setMessage(null);
-    try {
-      if (currentUser) {
-        // Logged-in user: add item to their cart (using user id)
-        await cartApi.addItemToCart(authRequest, currentUser.id, {
-          itemId: item.id,
-          quantity: 1,
-        });
-      } else {
-        // Guest user: use guest cart flow
-        await cartApi.addItemToGuestCart(publicRequest, getGuestCartId(), {
-          itemId: item.id,
-          quantity: 1,
-        });
-      }
-      setMessage(null);
-      setShowPrompt(true); // Show checkout/back to menu prompt
-    } catch (err) {
-      console.error("Add to cart error:", err);
-      setMessage("Failed to add item to cart.");
-    } finally {
-      setActionLoading(false);
+const handleAddToCart = async () => {
+  setActionLoading(true);
+  setMessage(null);
+  try {
+    if (currentUser) {
+      // Logged-in user: add item to their cart
+      await cartApi.addItemToCart(authRequest, currentUser.id, {
+        itemId: item.id,
+        quantity: 1,
+      });
+    } else {
+      // Guest user: ensure cart exists
+      const cartId = await createGuestCartIfNeeded();
+      await cartApi.addItemToGuestCart(publicRequest, cartId, {
+        itemId: item.id,
+        quantity: 1,
+      });
     }
-  };
+    setMessage(null);
+    setShowPrompt(true);
+  } catch (err) {
+    console.error("Add to cart error:", err);
+    setMessage("Failed to add item to cart.");
+  } finally {
+    setActionLoading(false);
+  }
+};
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
