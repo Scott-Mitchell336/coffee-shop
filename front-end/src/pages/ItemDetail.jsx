@@ -46,16 +46,15 @@ const ItemDetail = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Create guest cart if needed, return cartId
-  // const createGuestCartIfNeeded = async () => {
-  //   let cartId = getGuestCartId();
-  //   if (!cartId) {
-  //     const newCart = await cartApi.createGuestCart(publicRequest);
-  //     cartId = newCart.id;
-  //     saveGuestCartId(cartId);
-  //   }
-  //   return cartId;
-  // };
+const createGuestCartIfNeeded = async () => {
+  let cartId = getGuestCartId();
+  if (!cartId) {
+    const newCart = await cartApi.createGuestCart(publicRequest);
+    cartId = newCart.id;
+    saveGuestCartId(cartId); // <== this is critical
+  }
+  return cartId;
+};
 
   // Update handleAddToCart to use CartContext
   const handleAddToCart = async () => {
