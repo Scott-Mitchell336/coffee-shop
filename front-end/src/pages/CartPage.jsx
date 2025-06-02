@@ -1,47 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { cartApi } from "../api/api";
-import { getGuestCartId } from "../utils/cart";
+import { useCart } from "../contexts/CartContext"; // Import useCart
 
 const CartPage = () => {
-  const { authRequest, publicRequest, currentUser } = useAuth();
-
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { user } = useAuth();
+  const { cart, loading, updateCartItem, removeCartItem } = useCart(); // Use CartContext
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // Fetch the user's cart items on mount
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setLoading(true);
-
-        if (currentUser) {
-          // Fetch authenticated user cart
-          const cartData = await cartApi.getUserCart(authRequest, currentUser.id);
-          console.log("Fetched cart data:", cartData);
-          setCartItems(cartData.items || []);
-        } else {
-          // Fetch guest cart
-          const guestCartId = getGuestCartId();
-          if (guestCartId) {
-            const guestCart = await cartApi.getGuestCart(publicRequest, guestCartId);
-             console.log("Fetched guest cart data:", guestCart);
-            setCartItems(guestCart.items || []);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch cart:", err);
-        setError("Failed to load cart.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCart();
-  }, [authRequest, publicRequest, currentUser]);
+  // We don't need to fetch cart items as CartContext already does that
+  // Just extract cart items from the cart object
+  const cartItems = cart?.cart_items?.flatMap((cartItem) =>
+    cartItem.cart_item_details.map((detail) => ({
+      itemId: detail.id,
+      quantity: detail.quantity,
+      item: detail.items,
+      instructions: detail.instructions,
+    }))
+  );
 
   // Calculate total price
   const totalPrice = cartItems.reduce(
@@ -55,15 +31,7 @@ const CartPage = () => {
     setActionLoading(true);
     setMessage(null);
     try {
-      await cartApi.updateItemQuantity(authRequest, currentUser.id, {
-        itemId,
-        quantity: newQuantity,
-      });
-      setCartItems((prev) =>
-        prev.map((ci) =>
-          ci.itemId === itemId ? { ...ci, quantity: newQuantity } : ci
-        )
-      );
+      await updateCartItem(itemId, newQuantity);
       setMessage("Cart updated.");
     } catch (err) {
       console.error("Failed to update quantity:", err);
@@ -79,8 +47,7 @@ const CartPage = () => {
     setActionLoading(true);
     setMessage(null);
     try {
-      await cartApi.removeItem(authRequest, currentUser.id, itemId);
-      setCartItems((prev) => prev.filter((ci) => ci.itemId !== itemId));
+      await removeCartItem(itemId);
       setMessage("Item removed from cart.");
     } catch (err) {
       console.error("Failed to remove item:", err);
@@ -92,8 +59,6 @@ const CartPage = () => {
 
   if (loading)
     return <p className="text-center text-gray-600">Loading your cart...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
-
   if (cartItems.length === 0)
     return <p className="text-center text-gray-600">Your cart is empty.</p>;
 
@@ -125,7 +90,9 @@ const CartPage = () => {
               type="number"
               min="1"
               value={quantity}
-              onChange={(e) => updateQuantity(itemId, parseInt(e.target.value))}
+              onChange={(e) =>
+                updateQuantity(itemId, parseInt(e.target.value))
+              }
               disabled={actionLoading}
               className="w-16 border rounded-md px-2 py-1 text-center"
             />
@@ -142,7 +109,8 @@ const CartPage = () => {
 
       <div className="text-right mt-6">
         <p className="text-xl font-semibold">
-          Total: <span className="text-blue-600">${totalPrice.toFixed(2)}</span>
+          Total:{" "}
+          <span className="text-blue-600">${totalPrice.toFixed(2)}</span>
         </p>
       </div>
 

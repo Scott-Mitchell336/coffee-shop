@@ -1,29 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext'; // Import useCart hook
 import { itemsApi } from '../api/api';
 
-//list of preferred categories in order
-const preferredCategories = [
-  "Coffee",
-  "Tea",
-  "Extras",
-  "Sandwiches",
-  "Baked",
-  "Bottled",
-];
-
-const capitalize = (str) => {
-  if (!str || typeof str !== 'string') return '';
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
-
-
+// Remove user from props, we'll get it from useAuth() instead
 const ItemsPage = ({ onAddToCart }) => {
+  // Get user from auth context to ensure it's always up-to-date
   const { publicRequest, authRequest, user } = useAuth();
+  const { addItemToCart } = useCart(); // Use the cart context
   const [items, setItems] = useState([]);
   const [loadingItems, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false); // For tracking add to cart state
   const navigate = useNavigate();
 
   const [selectedItem, setSelectedItem] = useState(null);
@@ -98,11 +87,19 @@ const ItemsPage = ({ onAddToCart }) => {
     }
   };
 
-  const handleAddToCart = (item) => {
-    if (onAddToCart) {
-      onAddToCart(item);
-    } else {
-      alert(`Added ${item.name} to cart! (Add your cart logic here)`);
+  // Update handleAddToCart to use CartContext
+  const handleAddToCart = async (item) => {
+    try {
+      setActionLoading(true);
+      await addItemToCart(item.id, 1);
+      // Show success feedback
+      alert(`${item.name} added to cart!`);
+      closeModal(); // Close the modal after adding to cart
+    } catch (error) {
+      console.error("Failed to add item to cart:", error);
+      alert(`Failed to add ${item.name} to cart. Please try again.`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -250,13 +247,13 @@ const ItemsPage = ({ onAddToCart }) => {
                 Price: ${selectedItem.price.toFixed(2)}
               </p>
 
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => handleAddToCart(selectedItem)}
-                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
-                >
-                  Add to Cart
-                </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => handleAddToCart(selectedItem)}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+              >
+                Add to Cart
+              </button>
 
                 {isAdmin && (
                   <div className="relative" ref={modifyDropdownRef}>

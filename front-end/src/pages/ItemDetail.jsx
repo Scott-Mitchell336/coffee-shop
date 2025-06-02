@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { itemsApi, cartApi } from "../api/api";
-import { getGuestCartId, saveGuestCartId } from "../utils/cart";
+import { getGuestCartId } from "../utils/cart";
 
 
 
 const ItemDetail = () => {
-  const { publicRequest, authRequest, currentUser } = useAuth();
+  const { publicRequest, authRequest, user } = useAuth();
+  const { addItemToCart } = useCart(); // Use CartContext
   const { itemId } = useParams();
   const navigate = useNavigate();
 
@@ -56,33 +57,32 @@ const createGuestCartIfNeeded = async () => {
   return cartId;
 };
 
-const handleAddToCart = async () => {
-  setActionLoading(true);
-  setMessage(null);
-  try {
-    if (currentUser) {
-      // Logged-in user: add item to their cart
-      await cartApi.addItemToCart(authRequest, currentUser.id, {
-        itemId: item.id,
-        quantity: 1,
-      });
-    } else {
-      // Guest user: ensure cart exists
-      const cartId = await createGuestCartIfNeeded();
-      await cartApi.addItemToGuestCart(publicRequest, cartId, {
-        itemId: item.id,
-        quantity: 1,
-      });
-    }
+  const handleAddToCart = async () => {
+    setActionLoading(true);
     setMessage(null);
-    setShowPrompt(true);
-  } catch (err) {
-    console.error("Add to cart error:", err);
-    setMessage("Failed to add item to cart.");
-  } finally {
-    setActionLoading(false);
-  }
-};
+    try {
+      if (currentUser) {
+        // Logged-in user: add item to their cart (using user id)
+        await cartApi.addItemToCart(authRequest, currentUser.id, {
+          itemId: item.id,
+          quantity: 1,
+        });
+      } else {
+        // Guest user: use guest cart flow
+        await cartApi.addItemToGuestCart(publicRequest, getGuestCartId(), {
+          itemId: item.id,
+          quantity: 1,
+        });
+      }
+      setMessage(null);
+      setShowPrompt(true); // Show checkout/back to menu prompt
+    } catch (err) {
+      console.error("Add to cart error:", err);
+      setMessage("Failed to add item to cart.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
@@ -114,7 +114,7 @@ const handleAddToCart = async () => {
     navigate("/items"); // or /menu if that's your route
   };
 
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = user?.role === "admin";
 
   if (loading)
     return <p className="text-center text-gray-600">Loading item details...</p>;
