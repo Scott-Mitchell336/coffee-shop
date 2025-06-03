@@ -1,6 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "node",
       "request": "launch",
@@ -11,12 +12,23 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
-    {
+      {
       "type": "chrome",
       "request": "launch",
-      "name": "Debug Frontend",
+      "name": "Debug Frontend (Improved)",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/front-end"
+      "webRoot": "${workspaceFolder}/front-end",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*",
+        "/./*": "${webRoot}/*",
+        "/src/*": "${webRoot}/src/*",
+        "/*": "*",
+        "/./~/*": "${webRoot}/node_modules/*"
+      },
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+      "runtimeArgs": ["--disable-web-security"],
+      "preLaunchTask": "start-vite-server"
     },
     {
       "type": "node",

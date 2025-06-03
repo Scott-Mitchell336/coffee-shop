@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useAuth } from './AuthContext'; // Import useAuth
 import { cartApi } from '../api/api'; // Import the cartApi functions
+import { saveGuestCartId } from "../utils/cart";
 
 const CartContext = createContext();
 
@@ -8,6 +9,7 @@ export const CartProvider = ({ children }) => {
   const { user, authRequest, publicRequest } = useAuth();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
+  
 
   // Get or create appropriate cart on component mount or when user changes
   useEffect(() => {
@@ -43,7 +45,10 @@ export const CartProvider = ({ children }) => {
             }
           } else {
             // No guest cart yet, that's okay
-            setCart(null);
+            const newCart = await cartApi.createGuestCart(publicRequest);
+            const cartId = newCart.id;
+            saveGuestCartId(cartId);
+            setCart(newCart);
           }
         }
       } catch (error) {
