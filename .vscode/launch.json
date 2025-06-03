@@ -14,9 +14,15 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Debug Frontend",
+      "name": "Debug Frontend (Improved)",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}/front-end"
+      "webRoot": "${workspaceFolder}/front-end",
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${webRoot}/*"
+      },
+      "sourceMaps": true,
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+      "runtimeArgs": ["--disable-web-security"]
     },
     {
       "type": "node",
