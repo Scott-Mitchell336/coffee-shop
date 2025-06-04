@@ -36,6 +36,7 @@ export const itemsApi = {
 export const cartApi = {
   // Get user cart
   getUserCart: async (authRequest, userId) => {
+    console.log("Fetching cart for user ID:", userId);
     return authRequest(`/carts/${userId}`);
   },
   
@@ -75,9 +76,9 @@ export const cartApi = {
     return publicRequest(`/carts/guest/${cartId}/items/${itemDetailId}`, 'DELETE');
   },
   
-  transferGuestCart: async (authRequest, guestCartId) => {
+  /*transferGuestCart: async (authRequest, guestCartId) => {
     return authRequest('/carts/transfer', 'POST', { guestCartId });
-  }
+  }*/
 };
 
 export { API_BASE_URL };

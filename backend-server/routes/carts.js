@@ -13,7 +13,7 @@ console.log("Registered routes for carts:");
   "delete /", "get /", "post /:user_id/items", "put /:user_id/items/:itemDetailId",
   "delete /:user_id/items/:itemDetailId", "post /guest", "get /guest/:cart_id",
   "post /guest/:cart_id/items", "put /guest/:cart_id/items/:itemDetailId",
-  "delete /guest/:cart_id/items/:itemDetailId", "post /transfer"
+  "delete /guest/:cart_id/items/:itemDetailId"
 ].forEach(route => console.log(`- ${route}`));
 
 // GUEST CART ROUTES
@@ -102,7 +102,7 @@ router.delete("/guest/:cart_id/items/:itemDetailId", async (req, res) => {
 });
 
 // POST /api/carts/transfer - Transfer a guest cart to a user account
-router.post("/transfer", authenticateToken, async (req, res) => {
+/*router.post("/transfer", authenticateToken, async (req, res) => {
   try {
     const { guestCartId } = req.body;
     const userId = req.user.id;
@@ -121,7 +121,7 @@ router.post("/transfer", authenticateToken, async (req, res) => {
     console.error("Error transferring guest cart:", error);
     res.status(500).json({ error: "Failed to transfer guest cart", message: error.message });
   }
-});
+});*/
 
 // AUTHENTICATED USER CART ROUTES
 // These routes handle carts for authenticated users
@@ -156,6 +156,9 @@ router.get("/:user_id", authenticateToken, async (req, res) => {
 router.post("/:user_id", authenticateToken, async (req, res) => {
   console.log("POST /api/carts/:user_id called");
   try {
+    console.log("Creating cart for user_id:", req.params.user_id);
+    console.log("Current user ID:", req.user.id);
+    console
     // For non-admin users, they can only create a cart for themselves
     if (req.user.id !== parseInt(req.params.user_id) && req.user.role !== 'administrator') {
       return res.status(403).json({ error: "Unauthorized to create cart for another user" });

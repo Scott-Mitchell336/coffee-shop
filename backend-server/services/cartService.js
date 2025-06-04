@@ -421,7 +421,7 @@ async function removeGuestCartItem(cartId, itemDetailId) {
 }
 
 // Transfer a guest cart to a user's account
-async function transferGuestCartToUser(guestCartId, userId) {
+/*async function transferGuestCartToUser(guestCartId, userId) {
   // Begin transaction to ensure all operations succeed or fail together
   return await prisma.$transaction(async (tx) => {
     // Get active guest cart with all items
@@ -516,7 +516,7 @@ async function transferGuestCartToUser(guestCartId, userId) {
       }
     });
   });
-}
+}*/
 
 module.exports = {
   getCartById,
@@ -533,6 +533,6 @@ module.exports = {
   getGuestCartById,
   addItemToGuestCart,
   updateGuestCartItem,
-  removeGuestCartItem,
-  transferGuestCartToUser
+  removeGuestCartItem
+  //transferGuestCartToUser
 };

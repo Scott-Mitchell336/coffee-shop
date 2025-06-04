@@ -19,11 +19,12 @@ export const CartProvider = ({ children }) => {
         if (user) {
           // Logged-in user: get their cart
           try {
+            console.log("Fetching cart for user:", user.id);
             const cartData = await cartApi.getUserCart(authRequest, user.id);
             setCart(cartData);
           } catch (error) {
             if (error.status === 404) {
-              // User has no cart yet, that's okay
+              console.log("Cart not found for user.id:", user.id);
               setCart(null);
             } else {
               throw error;
@@ -175,7 +176,7 @@ export const CartProvider = ({ children }) => {
   };
 
   // Transfer guest cart to user cart after login
-  const transferGuestCartToUser = async () => {
+  /*const transferGuestCartToUser = async () => {
     console.log("transferGuestCartToUser called");
     try {
       const guestCartId = localStorage.getItem('guestCartId');
@@ -197,7 +198,7 @@ export const CartProvider = ({ children }) => {
       console.error('Error transferring guest cart:', error);
       throw error;
     }
-  };
+  };*/
 
   return (
     <CartContext.Provider value={{
@@ -205,8 +206,8 @@ export const CartProvider = ({ children }) => {
       loading,
       addItemToCart,
       updateCartItem,
-      removeCartItem,
-      transferGuestCartToUser
+      removeCartItem
+      //transferGuestCartToUser
     }}>
       {children}
     </CartContext.Provider>

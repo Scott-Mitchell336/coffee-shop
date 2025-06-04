@@ -1,8 +1,8 @@
 const API_BASE_URL = "http://localhost:3000";
 
-import { cartApi } from "../api/api";
-import { getGuestCartId, clearGuestCartId } from "../utils/cart";
-import { useNavigate, Link } from 'react-router-dom';
+//import { cartApi } from "../api/api";
+//import { getGuestCartId, clearGuestCartId } from "../utils/cart";
+//import { useNavigate, Link } from 'react-router-dom';
 
 import React, {
   createContext,
@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }) => {
 
   // Wrap transferGuestCart in useCallback with proper dependencies
   // First create a reference to the function to fix the circular dependency
-  const transferGuestCartRef = useRef(null);
+  //const transferGuestCartRef = useRef(null);
 
   // Check auth status once on mount
   useEffect(() => {
@@ -133,9 +133,9 @@ export const AuthProvider = ({ children }) => {
 
         // Optional: Now that we have user data, we could call transferGuestCart
         // But only if the function is defined
-        if (transferGuestCartRef.current) {
-          transferGuestCartRef.current();
-        }
+        //if (transferGuestCartRef.current) {
+         // transferGuestCartRef.current();
+        //}
       } catch (err) {
         console.error("Authentication check failed:", err);
         localStorage.removeItem("token");
@@ -149,7 +149,7 @@ export const AuthProvider = ({ children }) => {
   }, [apiRequest, startIdleTimer]);
 
   // Define transferGuestCart and store in ref to avoid circular dependency
-  const transferGuestCart = useCallback(async () => {
+ /*const transferGuestCart = useCallback(async () => {
     const guestCartId = getGuestCartId();
     if (guestCartId && user) {
       try {
@@ -160,17 +160,17 @@ export const AuthProvider = ({ children }) => {
         console.error("Failed to transfer guest cart:", error);
       }
     }
-  }, [user, authRequest]);
+  }, [user, authRequest]);*/
 
   // Store the latest version of transferGuestCart in the ref
-  transferGuestCartRef.current = transferGuestCart;
+  //transferGuestCartRef.current = transferGuestCart;
 
   // Use the function in a separate useEffect
-  useEffect(() => {
+  /*useEffect(() => {
     if (user) {
       transferGuestCart();
     }
-  }, [user, transferGuestCart]);
+  }, [user, transferGuestCart]);*/
 
   // Login and register functions
   const login = useCallback(

@@ -12,7 +12,7 @@ function LoginPage() {
 
   // Get the cart context with a null check
   const cart = useCart();
-  const transferGuestCartToUser = cart?.transferGuestCartToUser;
+  //const transferGuestCartToUser = cart?.transferGuestCartToUser;
 
   const handleChange = (e) => {
     setCredentials({
@@ -33,7 +33,7 @@ function LoginPage() {
 
       
       // Transfer any guest cart to the user's account
-      await transferGuestCartToUser();
+      //await transferGuestCartToUser();
       
       console.log("naviagting to /menu");
       navigate('/menu');
