@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 const HomePage = () => {
   const featuredItems = [
@@ -18,11 +19,13 @@ const HomePage = () => {
       <div
         className="relative w-full h-[60vh] bg-cover bg-center flex items-center justify-center"
         style={{
-          backgroundImage: `url('https://via.placeholder.com/1600x600?text=Coffee+Shop+Background')`,
+          backgroundImage: `url("https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1600&q=80")`,
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-        <h1 className="relative text-white text-5xl font-bold z-10 text-center">Welcome to Moon Rock Café</h1>
+        {/*<div className="absolute inset-0 bg-black bg-opacity-20"></div>*/}
+       <h1 className="relative text-white text-6xl font-bold z-10 text-center drop-shadow-lg">
+  Welcome to Moon Rock Cafe
+</h1>
       </div>
 
       {/* Featured Items */}
@@ -53,6 +56,8 @@ const HomePage = () => {
           </Link>
         </div>
       </section>
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

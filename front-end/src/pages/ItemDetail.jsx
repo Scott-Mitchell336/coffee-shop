@@ -84,6 +84,7 @@ const ItemDetail = () => {
   };
 
   const handleDelete = async () => {
+    setShowDropdown(false); // Close dropdown before confirmation
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     setActionLoading(true);
     setMessage(null);
@@ -100,6 +101,7 @@ const ItemDetail = () => {
   };
 
   const handleEdit = () => {
+    setShowDropdown(false); // Close dropdown before navigating
     navigate(`/items/edit/${item.id}`);
   };
 
@@ -110,7 +112,7 @@ const ItemDetail = () => {
 
   const handleBackToMenu = () => {
     setShowPrompt(false);
-    navigate("/items"); // or /menu if that's your route
+    navigate("/items"); 
   };
 
   const isAdmin = user?.role === "admin";
