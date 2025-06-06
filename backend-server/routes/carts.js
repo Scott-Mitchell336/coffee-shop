@@ -7,14 +7,14 @@ const { authenticateToken, requireAdmin, checkUserAuthorization } = require("../
 console.log("Carts router loaded");
 
 // Add this at the beginning to see all route registrations
-console.log("Registered routes for carts:");
+/*console.log("Registered routes for carts:");
 [
   "get /:user_id", "post /:user_id", "put /:user_id", "delete /:user_id",
   "delete /", "get /", "post /:user_id/items", "put /:user_id/items/:itemDetailId",
   "delete /:user_id/items/:itemDetailId", "post /guest", "get /guest/:cart_id",
   "post /guest/:cart_id/items", "put /guest/:cart_id/items/:itemDetailId",
   "delete /guest/:cart_id/items/:itemDetailId"
-].forEach(route => console.log(`- ${route}`));
+].forEach(route => console.log(`- ${route}`));*/
 
 // GUEST CART ROUTES
 // These routes handle carts for users who are not logged in

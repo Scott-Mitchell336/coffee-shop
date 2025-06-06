@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useAuth } from './AuthContext'; // Import useAuth
 import { cartApi } from '../api/api'; // Import the cartApi functions
 import { saveGuestCartId } from "../utils/cart";
@@ -9,23 +9,30 @@ export const CartProvider = ({ children }) => {
   const { user, authRequest, publicRequest } = useAuth();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-  const firstRenderRef = useRef(true);
+  const fetchInProgressRef = useRef(false); // Track if fetch is in progress
+  const prevUserRef = useRef(null);  // Track previous user to detect changes
 
   // Get or create appropriate cart on component mount or when user changes
   useEffect(() => {
-    if (!firstRenderRef.current) {
-      // Skip the effect on first render
+    // Skip if a fetch is already in progress
+    if (fetchInProgressRef.current) {
       return;
     }
 
-    firstRenderRef.current = false;
+    // Check if the user has changed (login/logout)
+    const userChanged = prevUserRef.current !== user?.id;
+    prevUserRef.current = user?.id;
 
     const currentAuthRequest = authRequest; 
     const currentPublicRequest = publicRequest;
     
     const fetchCart = async () => {
-      console.log("fetchCart called at:", new Date().toISOString());
+      console.log(`fetchCart called at: ${new Date().toISOString()} for user: ${user?.id || 'guest'}`);
+      
+      // Set fetch in progress to prevent concurrent calls
+      fetchInProgressRef.current = true;
       setLoading(true);
+      
       try {
         if (user) {
           // Logged-in user: get their cart
@@ -43,35 +50,92 @@ export const CartProvider = ({ children }) => {
           }
         } else {
           // Guest user: get or create guest cart
-          let guestCartId = localStorage.getItem('guestCartId');
-          
+          let guestCartId = null;
+          try {
+            guestCartId = localStorage.getItem('guestCartId');
+            console.log("Retrieved guestCartId from localStorage:", guestCartId);
+          } catch (storageError) {
+            console.error("Error accessing localStorage:", storageError);
+          }
+
           if (guestCartId) {
             // Try to fetch existing guest cart
             try {
               const cartData = await cartApi.getGuestCart(currentPublicRequest, guestCartId);
               setCart(cartData);
             } catch (error) {
-              // Guest cart not found or expired, remove from localStorage
-              localStorage.removeItem('guestCartId');
+              console.error("Error fetching guest cart:", error);
+              console.log("Removing invalid guestCartId from localStorage");
+              try {
+                localStorage.removeItem('guestCartId');
+              } catch (removeError) {
+                console.error("Error removing guestCartId from localStorage:", removeError);
+              }
               setCart(null);
             }
           } else {
-            // No guest cart yet, that's okay
-            const newCart = await cartApi.createGuestCart(publicRequest);
-            const cartId = newCart.id;
-            saveGuestCartId(cartId);
-            setCart(newCart);
+            console.log("No guestCartId found, creating new cart");
+            try {
+              const newCart = await cartApi.createGuestCart(publicRequest);
+              const cartId = newCart.id;
+              saveGuestCartId(cartId);
+              setCart(newCart);
+            } catch (createError) {
+              console.error("Error creating guest cart:", createError);
+              setCart(null);
+            }
           }
         }
       } catch (error) {
         console.error('Error fetching cart:', error);
       } finally {
         setLoading(false);
+        fetchInProgressRef.current = false;
       }
     };
 
-    fetchCart();
+    // Only fetch on first render or when user changes
+    if (userChanged) {
+      fetchCart();
+    }
+    
   }, [user, authRequest, publicRequest]);
+
+  // Enable manual cart refresh
+  const refreshCart = useCallback(async () => {
+    if (fetchInProgressRef.current) {
+      console.log("Cart refresh already in progress");
+      return;
+    }
+    
+    console.log("Manual cart refresh requested");
+    
+    if (!user && !localStorage.getItem('guestCartId')) {
+      console.log("No user or guest cart to refresh");
+      return;
+    }
+    
+    fetchInProgressRef.current = true;
+    setLoading(true);
+    
+    try {
+      if (user) {
+        const cartData = await cartApi.getUserCart(authRequest, user.id);
+        setCart(cartData);
+      } else {
+        const guestCartId = localStorage.getItem('guestCartId');
+        if (guestCartId) {
+          const cartData = await cartApi.getGuestCart(publicRequest, guestCartId);
+          setCart(cartData);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to refresh cart:", error);
+    } finally {
+      setLoading(false);
+      fetchInProgressRef.current = false;
+    }
+  }, [user, authRequest, publicRequest]); // Add proper dependencies
 
   // Add item to cart
   const addItemToCart = async (itemId, quantity = 1, instructions = '') => {
@@ -217,8 +281,8 @@ export const CartProvider = ({ children }) => {
       loading,
       addItemToCart,
       updateCartItem,
-      removeCartItem
-      //transferGuestCartToUser
+      removeCartItem,
+      refreshCart // Export this new function
     }}>
       {children}
     </CartContext.Provider>

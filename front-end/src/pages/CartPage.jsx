@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useCart } from "../contexts/CartContext"; // Import useCart
+import { useCart } from "../contexts/CartContext";
 
 const CartPage = () => {
   const { user } = useAuth();
-  const { cart, loading, updateCartItem, removeCartItem } = useCart(); // Use CartContext
+  const { cart, loading, updateCartItem, removeCartItem, refreshCart } = useCart();
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const initialLoadRef = useRef(true);
+
+  // Only refresh the cart once when the component mounts
+  useEffect(() => {
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      refreshCart();
+    }
+  }, []); // Empty dependency array - only runs once
 
   // We don't need to fetch cart items as CartContext already does that
   // Just extract cart items from the cart object

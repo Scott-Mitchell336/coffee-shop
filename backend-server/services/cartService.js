@@ -12,6 +12,12 @@ async function getCartById(user_id) {
           cart_item_details: {
             include: {
               items: true // Include item details for each cart item detail
+            },
+            // Add orderBy to ensure consistent ordering
+            orderBy: {
+              created_at: 'asc'
+              //id: 'asc' // Sort by ID ascending (oldest first)
+              // Or use creation timestamp: created_at: 'asc'
             }
           }
         }
@@ -173,6 +179,8 @@ async function addItemToCart(userId, itemData) {
 
 // Function to update an item in the cart
 async function updateCartItem(userId, itemDetailId, updateData) {
+  console.log("updateCartItem called with:", { userId, itemDetailId, updateData });
+  const { quantity, instructions } = updateData;
   // Find the active cart and make sure it belongs to the user
   const cart = await prisma.carts.findFirst({
     where: { 
@@ -194,6 +202,7 @@ async function updateCartItem(userId, itemDetailId, updateData) {
 
   // Check if the cart item detail belongs to this cart
   const cartItemIds = cart.cart_items.map(item => item.id);
+  console.log("Cart item IDs:", cartItemIds);
   const cartItemDetail = await prisma.cart_item_details.findFirst({
     where: {
       id: parseInt(itemDetailId),
@@ -295,6 +304,10 @@ async function getGuestCartById(cartId) {
           cart_item_details: {
             include: {
               items: true
+            },
+            // Add orderBy to ensure consistent ordering
+            orderBy: {
+              id: 'asc' // Sort by ID ascending (oldest first)
             }
           }
         }
