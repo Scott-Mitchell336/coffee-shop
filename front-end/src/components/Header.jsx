@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 const Header = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // State for search input
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +21,10 @@ const Header = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    // Implement search logic here, e.g. navigate or filter menu
+    if (searchTerm.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
+      setSearchTerm(""); // Clear search input after submission
+    }
     console.log("Search for:", searchTerm);
   };
 
@@ -52,7 +56,7 @@ const Header = () => {
           <div className="flex items-center space-x-3">
             <p className="text-2xl font-bold text-gray-800">Moon Rock Cafe</p>
             <img
-              src="https://via.placeholder.com/80x40?text=Logo"
+              src="https://cdn.vectorstock.com/i/2000v/07/96/dark-alien-landscape-vector-52000796.avif"
               alt="Moon Rock Cafe Logo"
               className="h-10 object-contain"
             />
@@ -62,7 +66,7 @@ const Header = () => {
         {/* Right User Section with Search */}
         <div className="flex items-center space-x-8">
           {/* Search bar */}
-          <form onSubmit={handleSearchSubmit} className="mr-4">
+          <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2">
             <input
               type="text"
               value={searchTerm}
@@ -70,6 +74,12 @@ const Header = () => {
               placeholder="Search..."
               className="border border-gray-200 rounded px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm"
+              aria-label="Search">
+                Search
+              </button>
           </form>
 
           {user ? (
@@ -122,23 +132,14 @@ const Header = () => {
 export default Header;
 
 
-// This code defines a Header component for a cafe website, including navigation links, user authentication status, and a search bar.
-// It uses React Router for navigation and includes a shopping cart icon from Heroicons.
-// The header is styled with Tailwind CSS classes for a clean and modern look.
-// The component also handles user login/logout and displays a welcome message with the user's name if logged in.
-// The search functionality is set up but not fully implemented; it currently logs the search term to the console.
-// The header is responsive and adapts to different screen sizes, ensuring a good user experience across devices.
-// The component uses the useAuth context to access user authentication state and actions.
-// The header is designed to be reusable across different pages of the application, providing a consistent navigation experience.
-// The component is structured to be easily maintainable and extendable, allowing for future enhancements like additional navigation links or user profile features.
-// The Header component is a functional React component that serves as the navigation bar for the cafe website.
-// It includes links to the home page, menu, and user authentication actions (login/logout).
-// The header also features a search bar for users to search for menu items.
-// The component uses Tailwind CSS for styling and is responsive to different screen sizes.
-// The component is designed to be reusable and maintainable, with clear separation of concerns.
-// The Header component is a functional React component that serves as the navigation bar for the cafe website.
-// It includes links to the home page, menu, and user authentication actions (login/logout).
-// The header also features a search bar for users to search for menu items.
-// The component uses Tailwind CSS for styling and is responsive to different screen sizes.
-// The component is designed to be reusable and maintainable, with clear separation of concerns.
-// The Header component is a functional React component that serves as the navigation bar for the cafe website.         
+// Header component for a cafe website, including navigation links, user authentication status, and a search bar.
+// Uses React Router for navigation and includes a shopping cart icon from Heroicons.
+// Styled with Tailwind CSS.
+// Handles user login/logout and displays a welcome message with the user's name if logged in.
+// Header is responsive and adapts to different screen sizes, ensuring a good user experience across devices.
+// Uses the useAuth context to access user authentication state and actions.
+// Designed to be reusable across different pages of the application, providing a consistent navigation experience.
+// Structured to be easily maintainable and extendable, allowing for future enhancements like additional navigation links or user profile features.
+// Serves as the navigation bar for the entire website.
+// Includes links to the home page, menu, and user authentication actions (login/logout).
+// Search bar for users to search for menu items.        

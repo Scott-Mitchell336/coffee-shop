@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
 import { itemsApi } from "../api/api";
+import Footer from "../components/Footer";
+
 
 const ItemsPage = () => {
   const { publicRequest, authRequest, user } = useAuth();
@@ -291,6 +293,7 @@ const ItemsPage = () => {
           )}
         </main>
       </div>
+      <Footer />
     </>
   );
 };

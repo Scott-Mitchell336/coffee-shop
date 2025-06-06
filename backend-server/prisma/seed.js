@@ -75,7 +75,7 @@ async function main() {
     { name: 'Espresso', description: 'Strong single shot of coffee', price: 2.50, category: 'coffee', image_url: 'https://example.com/espresso.jpg' },
     { name: 'Americano', description: 'Espresso diluted with hot water', price: 3.00, category: 'coffee', image_url: 'https://example.com/americano.jpg' },
     { name: 'Cappuccino', description: 'Espresso with steamed milk and foam', price: 3.50, category: 'coffee', image_url: 'https://example.com/cappuccino.jpg' },
-    { name: 'Latte', description: 'Espresso with steamed milk', price: 3.75, category: 'coffee', image_url: 'https://example.com/latte.jpg' },
+    { name: 'Latte', description: 'Espresso with steamed milk', price: 3.75, category: 'coffee', image_url: 'https://nucleuscoffee.com/cdn/shop/articles/Latte-recipe.jpg?v=1714499640' },
     { name: 'Mocha', description: 'Espresso with chocolate and steamed milk', price: 4.00, category: 'coffee', image_url: 'https://example.com/mocha.jpg' },
     { name: 'Macchiato', description: 'Espresso with a dash of frothy milk', price: 3.25, category: 'coffee', image_url: 'https://example.com/macchiato.jpg' },
     { name: 'Flat White', description: 'Espresso with steamed milk and microfoam', price: 3.50, category: 'coffee', image_url: 'https://example.com/flatwhite.jpg' },

@@ -9,6 +9,9 @@
     "start": "node server/server.js",
     "dev": "nodemon server/server.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Scott-Mitchell336/coffee-shop.git"

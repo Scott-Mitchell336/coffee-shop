@@ -81,4 +81,20 @@ export const cartApi = {
   }*/
 };
 
+// Search APIs
+export async function searchItems(publicRequest, query) {
+  if (!query) {
+    return [];
+  }
+  try {
+    const response = await publicRequest(`/items/search?query=${encodeURIComponent(query)}`);
+    if (!response || !response.data) {
+      throw new Error("Nothing found in search results");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Search error:", error);
+    throw error;
+  }
+}
 export { API_BASE_URL };
