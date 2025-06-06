@@ -130,7 +130,7 @@ async function main() {
   console.log(`Created ${createdItems.length} items`);
 
   // Create carts for some users
-  const cartUsers = users.filter(user => user.role === 'user').slice(0, 10);
+ /* const cartUsers = users.filter(user => user.role === 'user').slice(0, 10);
   const carts = await Promise.all(
     cartUsers.map(user => 
       prisma.carts.create({
@@ -181,7 +181,7 @@ async function main() {
   const cartItemDetails = await Promise.all(
     cartItemDetailsData.map(data => prisma.cart_item_details.create({ data }))
   );
-  console.log(`Created ${cartItemDetails.length} cart item details`);
+  console.log(`Created ${cartItemDetails.length} cart item details`);*/
 
   console.log('Seeding completed successfully!');
 }

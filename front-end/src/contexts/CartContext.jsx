@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { useAuth } from './AuthContext'; // Import useAuth
 import { cartApi } from '../api/api'; // Import the cartApi functions
 import { saveGuestCartId } from "../utils/cart";
@@ -9,18 +9,29 @@ export const CartProvider = ({ children }) => {
   const { user, authRequest, publicRequest } = useAuth();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const firstRenderRef = useRef(true);
 
   // Get or create appropriate cart on component mount or when user changes
   useEffect(() => {
+    if (!firstRenderRef.current) {
+      // Skip the effect on first render
+      return;
+    }
+
+    firstRenderRef.current = false;
+
+    const currentAuthRequest = authRequest; 
+    const currentPublicRequest = publicRequest;
+    
     const fetchCart = async () => {
+      console.log("fetchCart called at:", new Date().toISOString());
       setLoading(true);
       try {
         if (user) {
           // Logged-in user: get their cart
           try {
             console.log("Fetching cart for user:", user.id);
-            const cartData = await cartApi.getUserCart(authRequest, user.id);
+            const cartData = await cartApi.getUserCart(currentAuthRequest, user.id);
             setCart(cartData);
           } catch (error) {
             if (error.status === 404) {
@@ -37,7 +48,7 @@ export const CartProvider = ({ children }) => {
           if (guestCartId) {
             // Try to fetch existing guest cart
             try {
-              const cartData = await cartApi.getGuestCart(publicRequest, guestCartId);
+              const cartData = await cartApi.getGuestCart(currentPublicRequest, guestCartId);
               setCart(cartData);
             } catch (error) {
               // Guest cart not found or expired, remove from localStorage

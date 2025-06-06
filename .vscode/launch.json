@@ -27,7 +27,7 @@
       },
       "sourceMaps": true,
       "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
-      "runtimeArgs": ["--disable-web-security"],
+      // "runtimeArgs": ["--disable-web-security"],
       "preLaunchTask": "start-vite-server"
     },
     {

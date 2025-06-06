@@ -15,6 +15,7 @@ export const cartApi = {
 
   // Create a new guest cart
   createGuestCart: async (publicRequest) => {
+    console.log("createGuestCart called at:", new Date().toISOString());
     const res = await publicRequest.post(`${BASE_URL}/guest-cart`);
     return res.data;
   },

@@ -13,17 +13,18 @@ const CartPage = () => {
   const cartItems = cart?.cart_items?.flatMap((cartItem) =>
     cartItem.cart_item_details.map((detail) => ({
       itemId: detail.id,
-      quantity: detail.quantity,
-      item: detail.items,
-      instructions: detail.instructions,
+      quantity: detail.quantity || 0,
+      item: detail.items || { name: 'Unknown item', price: 0 },
+      instructions: detail.instructions || '',
     }))
-  );
+  ) || [];  // Add this empty array fallback
 
-  // Calculate total price
-  const totalPrice = cartItems.reduce(
-    (total, cartItem) => total + cartItem.item.price * cartItem.quantity,
-    0
-  );
+  // Calculate total price with proper fallbacks
+  const totalPrice =
+    cartItems?.reduce(
+      (total, cartItem) => total + (cartItem.item?.price || 0) * (cartItem.quantity || 0),
+      0
+    ) || 0;
 
   // Handle quantity change
   const updateQuantity = async (itemId, newQuantity) => {
@@ -59,14 +60,14 @@ const CartPage = () => {
 
   if (loading)
     return <p className="text-center text-gray-600">Loading your cart...</p>;
-  if (cartItems.length === 0)
+  if (cartItems?.length === 0)
     return <p className="text-center text-gray-600">Your cart is empty.</p>;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
       <h1 className="text-3xl font-semibold mb-6">Welcome to Your Cart</h1>
 
-      {cartItems.map(({ itemId, quantity, item }) => (
+      {cartItems?.map(({ itemId, quantity, item }) => (
         <div
           key={itemId}
           className="flex items-center justify-between border-b border-gray-200 py-4"
