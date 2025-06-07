@@ -4,7 +4,7 @@ require("dotenv").config();
 const cartService = require("../services/cartService");
 const { authenticateToken, requireAdmin, checkUserAuthorization } = require("../middleware/auth");
 
-console.log("Carts router loaded");
+//console.log("Carts router loaded");
 
 // Add this at the beginning to see all route registrations
 /*console.log("Registered routes for carts:");

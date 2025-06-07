@@ -22,6 +22,33 @@ router.get("/", async (req, res) => {
     }
 });
 
+// GET /api/items/search --- this will search for items based on query parameters (public - no auth required)
+router.get("/search", async (req, res) => {
+    console.log("Search query parameters:", req.query);
+    const query = req.query.query;
+    console.log("Search query:", query);
+    if (!query) {
+        return res.status(400).json({ error: "Missing search query" });
+    }
+    if (query.length < 3) {
+        return res.status(400).json({ error: "Search query must be at least 3 characters long" });
+    }
+
+    try {
+        // Pass all query parameters to the service
+        const items = await itemService.searchItems(req.query);
+        
+        if (!items || items.length === 0) {
+            return res.status(404).json({ message: "No items found matching your search criteria" });
+        }
+        
+        res.json(items);
+    } catch (error) {
+        console.error("Error searching items:", error);
+        res.status(500).json({ error: "Failed to search items", message: error.message });
+    }
+});
+
 // GET /api/items/:item_id --- this will get a certain item with item_id (public - no auth required)
 router.get("/:itemId", async (req, res) => {
     try {
@@ -69,34 +96,6 @@ router.delete("/:itemId", authenticateToken, requireAdmin, async (req, res) => {
     } catch (error) {
         console.error("Error deleting item:", error);
         res.status(500).json({ error: "Failed to delete item", message: error.message });
-    }
-});
-
-// GET /api/items/search --- this will search for items based on query parameters (public - no auth required)
-router.get("/search", async (req, res) => {
-    const query = req.query.query;
-    if (!query) {
-        return res.status(400).json({ error: "Missing search query" });
-    }
-    if (query.length < 3) {
-        return res.status(400).json({ error: "Search query must be at least 3 characters long" });
-    }
-
-    try {
-        const { name, category, priceRange } = req.query;
-        const items = await prisma.items.findMany({
-            where: {
-                OR: [
-                    { name: { contains: name, mode: 'insensitive' } },
-                    { category: { contains: category, mode: 'insensitive' } },
-                    { price: { gte: parseFloat(priceRange?.split('-')[0] || 0), lte: parseFloat(priceRange?.split('-')[1] || Number.MAX_SAFE_INTEGER) } }
-                ]
-            }
-        });
-       res.json(items);
-    } catch (error) {
-        console.error("Error searching items:", error);
-        res.status(500).json({ error: "Failed to search items", message: error.message });
     }
 });
 

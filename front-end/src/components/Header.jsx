@@ -22,7 +22,8 @@ const Header = () => {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
+      const searachValue = encodeURIComponent(searchTerm);
+      navigate(`/search?query=${searachValue}`);
       setSearchTerm(""); // Clear search input after submission
     }
     console.log("Search for:", searchTerm);

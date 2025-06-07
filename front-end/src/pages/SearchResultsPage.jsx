@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import Fuse from "fuse.js";
 import { searchItems } from "../api/api";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function SearchResultsPage() {
   const location = useLocation();
+  console.log("location.search = ", location.search);
   const queryParams = new URLSearchParams(location.search);
+  console.log("queryParams = ", queryParams);
   const query = queryParams.get("query") || "";
+  const { publicRequest } = useAuth();
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,7 +26,9 @@ export default function SearchResultsPage() {
       setLoading(true);
       setError(" ");
       try {
-        const results = await searchItems(query);
+        console.log("Fetching search results for query:", query);
+        const results = await searchItems(publicRequest, query);
+        console.log("Search results:", results);
         setItems(results);
       } catch (err) {
         console.error("Failed to fetch search results.");
@@ -42,7 +48,9 @@ return (
 
       {loading && <p>Loading results...</p>}
       {error && <p className="text-red-500">{error}</p>}
-
+      {console.log("loading = ",loading)}
+      
+      {console.log("items = ",items)}
       {!loading && !error && (
         items.length > 0 ? (
           <ul className="space-y-4">
