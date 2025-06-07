@@ -68,7 +68,7 @@ const ItemDetail = () => {
     console.log("Guest cart ID:", getGuestCartId());
     if (!user && !getGuestCartId()) {
       console.log("Creating guest cart...");
-      createGuestCartIfNeeded();
+      await createGuestCartIfNeeded(); // Added an await to ensure guest cart exists
     }
     try {
       // Use the addItemToCart function from CartContext
@@ -112,7 +112,7 @@ const ItemDetail = () => {
 
   const handleBackToMenu = () => {
     setShowPrompt(false);
-    navigate("/items"); 
+    navigate("/items");
   };
 
   const isAdmin = user?.role === "admin";
@@ -127,11 +127,11 @@ const ItemDetail = () => {
     <div className="fixed top-10 left-1/2 transform -translate-x-1/2 bg-white p-6 shadow-lg max-w-md w-full rounded-lg z-50">
       <h2 className="text-2xl font-semibold mb-4">{item.name}</h2>
 
-      {item.imageUrl && (
+      {item.image_url && (
         <img
-          src={item.imageUrl}
+          src={item.image_url}
           alt={item.name}
-          className="w-full max-h-64 object-cover rounded-md mb-4"
+          className="w-full max-w-xs h-auto object-cover rounded-md mb-4"
         />
       )}
 
@@ -158,6 +158,9 @@ const ItemDetail = () => {
             onClick={() => setShowDropdown((prev) => !prev)}
             disabled={actionLoading}
             className="px-4 py-2 rounded-md bg-gray-200 hover:bg-gray-300 font-semibold"
+            aria-haspopup="menu" // Indicates it opens a menu
+            aria-expanded={showDropdown} // Reflects whether the menu is open or closed
+            aria-label="Modify item options" // Describes button purpose
           >
             Modify ▼
           </button>

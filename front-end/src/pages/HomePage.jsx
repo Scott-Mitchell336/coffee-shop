@@ -50,7 +50,7 @@ const HomePage = () => {
         <div className="text-center mt-10">
           <Link
             to="/menu"
-            className="inline-block bg-blue-500 text-white font-semibold py-3 px-6 rounded-full shadow hover:bg-blue-600 transition duration-300"
+            className="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow hover:bg-indigo-600 transition duration-300"
           >
             Browse Full Menu
           </Link>

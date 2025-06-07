@@ -30,103 +30,88 @@ const Header = () => {
   };
 
   return (
-    <nav className="w-full border-b border-gray-200 bg-white shadow-lg py-5 px-6">
-      <ul className="flex items-center justify-between text-med font-medium">
-        {/* Left Navigation Links */}
-        <div className="flex items-center space-x-12">
-          <li>
-            <Link
-              to="/"
-              className="text-blue-500 hover:text-blue-600 font-bold"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/menu"
-              className="text-blue-500 hover:text-blue-600 font-bold"
-            >
-              Menu
-            </Link>
-          </li>
-        </div>
+    <nav className="w-full border-b border-gray-200 bg-white shadow-lg px-6 pt-5 pb-2">
+  {/* Top Row: Nav links, Centered Name, Search + User Links */}
+  <div className="flex items-center justify-between text-med font-medium">
+    {/* Left Navigation Links */}
+    <div className="flex items-center space-x-12">
+      <Link to="/" className="text-blue-500 hover:text-blue-600 font-bold">
+        Home
+      </Link>
+      <Link to="/menu" className="text-blue-500 hover:text-blue-600 font-bold">
+        Menu
+      </Link>
+    </div>
 
-        {/* Center Logo */}
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="flex items-center space-x-3">
-            <p className="text-2xl font-bold text-gray-800">Moon Rock Cafe</p>
-            <img
-              src="https://cdn.vectorstock.com/i/2000v/07/96/dark-alien-landscape-vector-52000796.avif"
-              alt="Moon Rock Cafe Logo"
-              className="h-10 object-contain"
-            />
-          </div>
-        </div>
+    {/* Center Cafe Name + logo wrapped in link pointing to Home */}
+    <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
+      <p className="text-2xl font-bold text-gray-800">Moon Rock Cafe</p>
+    </div>
 
-        {/* Right User Section with Search */}
-        <div className="flex items-center space-x-8">
-          {/* Search bar */}
-          <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search..."
-              className="border border-gray-200 rounded px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm"
-              aria-label="Search">
-                Search
-              </button>
-          </form>
+    {/* Right Section: Search, Auth Links, Cart */}
+    <div className="flex items-center space-x-6">
+      {/* Search */}
+      <form onSubmit={handleSearchSubmit} className="flex items-center space-x-2">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search..."
+          className="border border-gray-200 rounded px-4 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          className="bg-gray-500 text-white px-2 py-1 rounded hover:bg-indigo-600 text-sm"
+          aria-label="Search"
+        >
+          Search
+        </button>
+      </form>
 
-          {user ? (
-            <>
-              <li className="text-blue-500 font-bold">
-                Hello, {user.username}!
-              </li>
-              <li>
-                <button
-                  onClick={logout}
-                  className="bg-blue-500 hover:bg-red-600 text-white px-4 py-1 rounded"
-                  aria-label="Logout"
-                >
-                  Logout
-                </button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link
-                  to="/login"
-                  className="text-blue-500 hover:text-blue-600 font-bold"
-                >
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/register"
-                  className="text-blue-500 hover:text-blue-600 font-bold"
-                >
-                  Sign Up
-                </Link>
-              </li>
-            </>
-          )}
+      {/* Auth */}
+      {user ? (
+        <>
+          <span className="text-blue-500 font-bold">
+            Hello, {user.username}!
+          </span>
+          <button
+            onClick={logout}
+            className="bg-blue-500 hover:bg-red-600 text-white px-4 py-1 rounded"
+            aria-label="Logout"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link to="/login" className="text-blue-500 hover:text-blue-600 font-bold">
+            Login
+          </Link>
+          <Link to="/register" className="text-blue-500 hover:text-blue-600 font-bold">
+            Sign Up
+          </Link>
+        </>
+      )}
 
-          <li>
-            <Link to="/cart" className="text-blue-500 hover:text-blue-600">
-              <ShoppingCartIcon className="h-6 w-6" />
-            </Link>
-          </li>
-        </div>
-      </ul>
-    </nav>
+      {/* Cart */}
+      <Link to="/cart" className="text-blue-500 hover:text-blue-600">
+        <ShoppingCartIcon className="h-6 w-6" />
+      </Link>
+    </div>
+  </div>
+
+  {/* Bottom Row: Logo under cafe name */}
+  <div className="flex justify-center mt-2">
+    <Link to ="/" className="flex flex-col items-center">
+    <img
+      src="https://cdn.vectorstock.com/i/2000v/07/96/dark-alien-landscape-vector-52000796.avif"
+      alt="Moon Rock Cafe Logo"
+      className="w-15 h-15 rounded-full object-cover"
+    />
+    </Link>
+  </div>
+</nav>
+
   );
 };
 

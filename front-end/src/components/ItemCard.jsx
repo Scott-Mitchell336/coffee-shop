@@ -1,9 +1,3 @@
-/*Displays an item (e.g., coffee drink, pastry) with:
-Image
-Name
-Description
-*/
-
 import React from 'react';
 
 function ItemCard({ item }) {
