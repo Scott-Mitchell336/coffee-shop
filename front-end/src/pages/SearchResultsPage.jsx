@@ -14,7 +14,7 @@ export default function SearchResultsPage() {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(" ");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -24,7 +24,7 @@ export default function SearchResultsPage() {
 
     async function fetchSearchResults() {
       setLoading(true);
-      setError(" ");
+      setError(null);
       try {
         console.log("Fetching search results for query:", query);
         const results = await searchItems(publicRequest, query);
@@ -32,6 +32,7 @@ export default function SearchResultsPage() {
         setItems(results);
       } catch (err) {
         console.error("Failed to fetch search results.");
+        setError(err);
       } finally {
         setLoading(false);
       }
@@ -49,8 +50,9 @@ return (
       {loading && <p>Loading results...</p>}
       {error && <p className="text-red-500">{error}</p>}
       {console.log("loading = ",loading)}
-      
+      {console.log("error = ",error)}
       {console.log("items = ",items)}
+    
       {!loading && !error && (
         items.length > 0 ? (
           <ul className="space-y-4">
