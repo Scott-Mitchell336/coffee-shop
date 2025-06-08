@@ -313,6 +313,23 @@ router.put("/:user_id/items/:itemDetailId", authenticateToken, async (req, res) 
   }
 });
 
+// DELETE /api/carts/:cart_id/removeAllItems- Remove allitems form a cart
+router.delete("/:cart_id/removeAllItems", authenticateToken, async (req, res) => {
+  try {
+    // Users can only remove all items from their own cart unless they're an admin
+    if (req.user.id !== parseInt(req.params.user_id) && req.user.role !== 'administrator') {
+      return res.status(403).json({ error: "Unauthorized to remove items from this cart" });
+    }
+
+    const cart = await cartService.removeAllItemsFromCart(req.params.cart_id);
+
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error("Error removing all items from cart:", error);
+    res.status(500).json({ error: "Failed to remove all items from cart", message: error.message });
+  }
+}); 
+
 // DELETE /api/carts/:user_id/items/:itemDetailId - Remove an item from the cart
 router.delete("/:user_id/items/:itemDetailId", authenticateToken, async (req, res) => {
   try {
@@ -330,6 +347,35 @@ router.delete("/:user_id/items/:itemDetailId", authenticateToken, async (req, re
   }
 });
 
+// PUT /api/carts/complete/:cart_id - Mark a user cart as complete
+router.put("/:cart_id/complete", authenticateToken, async (req, res) => {
+  try {
+    const cart = await cartService.markCartAsComplete(req.params.cart_id);
+    if (!cart) {
+      return res.status(404).json({ error: "Guest cart not found" });
+    }
+    console.log("Cart completed successfully:", cart);
+    res.json(cart);
+  } catch (error) {
+    console.error("Error completing cart:", error);
+    res.status(500).json({ error: "Failed to complete cart", message: error.message });
+  }
+});
+
+// PUT /api/carts/guest/:cart_id/complete - Mark a guest cart as complete
+router.put("/guest/:cart_id/complete", async (req, res) => {
+  try {
+    const cart = await cartService.markCartAsComplete(req.params.cart_id);
+    if (!cart) {
+      return res.status(404).json({ error: "Guest cart not found" });
+    }
+    console.log("Cart completed successfully:", cart);
+    res.json(cart);
+  } catch (error) {
+    console.error("Error completing guest cart:", error);
+    res.status(500).json({ error: "Failed to complete guest cart", message: error.message });
+  }
+});
 
 
 module.exports = router;

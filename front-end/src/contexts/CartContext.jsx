@@ -250,6 +250,41 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Complete cart (mark as finished/paid)
+  const completeCart = async () => {
+    try {
+      if (user) {
+        // User cart - first need to get the active cart ID
+        if (!cart || !cart.id) {
+          throw new Error('No active cart found to complete');
+        }
+        
+        console.log(`Completing user cart with ID: ${cart.id}`);
+        const completedCart = await cartApi.completeCartById(authRequest, cart.id);
+        setCart(null); // Clear the current cart after completion
+        return completedCart;
+      } else {
+        // Guest cart
+        const guestCartId = localStorage.getItem('guestCartId');
+        
+        if (!guestCartId) {
+          throw new Error('No guest cart found to complete');
+        }
+        
+        console.log(`Completing guest cart with ID: ${guestCartId}`);
+        const completedCart = await cartApi.completeGuestCartById(publicRequest, guestCartId);
+        
+        // Clear the guest cart ID from localStorage after completion
+        localStorage.removeItem('guestCartId');
+        setCart(null); // Clear the current cart
+        return completedCart;
+      }
+    } catch (error) {
+      console.error('Error completing cart:', error);
+      throw error;
+    }
+  };
+
   // Transfer guest cart to user cart after login
   /*const transferGuestCartToUser = async () => {
     console.log("transferGuestCartToUser called");
@@ -282,7 +317,8 @@ export const CartProvider = ({ children }) => {
       addItemToCart,
       updateCartItem,
       removeCartItem,
-      refreshCart // Export this new function
+      refreshCart, // Export this new function
+      completeCart
     }}>
       {children}
     </CartContext.Provider>

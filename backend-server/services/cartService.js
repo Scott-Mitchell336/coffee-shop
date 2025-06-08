@@ -85,6 +85,69 @@ async function deleteCart(userId) {
   });
 }
 
+/**
+ * Remove all items from a specific cart
+ * @param {number|string} cartId - The ID of the cart to clear
+ * @returns {Promise<Object>} The updated cart with no items
+ */
+async function removeAllItemsFromCart(cartId) {
+  // First, find the cart to make sure it exists
+  const cart = await prisma.carts.findUnique({
+    where: { id: parseInt(cartId) },
+    include: {
+      cart_items: {
+        include: {
+          cart_item_details: true
+        }
+      }
+    }
+  });
+
+  if (!cart) {
+    throw new Error(`Cart with ID ${cartId} not found`);
+  }
+
+  // Begin a transaction to ensure data integrity
+  return await prisma.$transaction(async (tx) => {
+    // Get all cart_item IDs for this cart
+    const cartItemIds = cart.cart_items.map(item => item.id);
+    
+    // Delete all cart_item_details for these cart_items
+    if (cartItemIds.length > 0) {
+      await tx.cart_item_details.deleteMany({
+        where: {
+          cart_item_id: {
+            in: cartItemIds
+          }
+        }
+      });
+      
+      // Delete all the cart_items
+      await tx.cart_items.deleteMany({
+        where: {
+          cart_id: parseInt(cartId)
+        }
+      });
+    }
+    
+    // Return the updated (now empty) cart
+    return await tx.carts.findUnique({
+      where: { id: parseInt(cartId) },
+      include: {
+        cart_items: {
+          include: {
+            cart_item_details: {
+              include: {
+                items: true
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
 async function getAllCarts() {
   return await prisma.carts.findMany({
     include: {
@@ -282,6 +345,27 @@ async function removeCartItem(userId, itemDetailId) {
 
   // Return the updated cart
   return await getCartById(userId);
+}
+// Mark a cart as completed
+async function markCartAsComplete(cartId) {
+  return await prisma.carts.update({
+    where: { id: parseInt(cartId) },
+    data: {
+      cart_completed: true,
+      updated_at: new Date()
+    },
+    include: {
+      cart_items: {
+        include: {
+          cart_item_details: {
+            include: {
+              items: true
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 // Create a cart for a guest (no user_id)
@@ -546,6 +630,7 @@ module.exports = {
   getGuestCartById,
   addItemToGuestCart,
   updateGuestCartItem,
-  removeGuestCartItem
+  removeGuestCartItem,
+  markCartAsComplete
   //transferGuestCartToUser
 };

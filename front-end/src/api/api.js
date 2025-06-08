@@ -76,9 +76,15 @@ export const cartApi = {
     return publicRequest(`/carts/guest/${cartId}/items/${itemDetailId}`, 'DELETE');
   },
   
-  /*transferGuestCart: async (authRequest, guestCartId) => {
-    return authRequest('/carts/transfer', 'POST', { guestCartId });
-  }*/
+  // Complete a cart by cart ID (for user carts)
+  completeCartById: async (authRequest, cartId) => {
+    return await authRequest(`/carts/${cartId}/complete`, 'PUT');
+  },
+
+  // Complete a guest cart by cart ID
+  completeGuestCartById: async (publicRequest, cartId) => {
+    return await publicRequest(`/carts/guest/${cartId}/complete`, 'PUT');
+  },
 };
 
 // Search APIs

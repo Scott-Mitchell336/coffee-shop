@@ -9,7 +9,7 @@ import { getGuestCartId, saveGuestCartId } from "../utils/cart";
 
 const ItemDetail = () => {
   const { publicRequest, authRequest, user } = useAuth();
-  const { addItemToCart } = useCart(); // Use CartContext
+  const { addItemToCart, completeCart } = useCart(); // Use CartContext
   const { itemId } = useParams();
   const navigate = useNavigate();
 
@@ -107,7 +107,8 @@ const ItemDetail = () => {
 
   const handleCheckout = () => {
     setShowPrompt(false);
-    navigate("/checkout");
+    completeCart();
+    navigate("/");
   };
 
   const handleBackToMenu = () => {

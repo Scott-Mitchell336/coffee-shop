@@ -5,7 +5,14 @@ import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useAuth();
-  const { cart, loading, updateCartItem, removeCartItem, refreshCart } = useCart();
+  const {
+    cart,
+    loading,
+    updateCartItem,
+    removeCartItem,
+    refreshCart,
+    completeCart,
+  } = useCart();
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const initialLoadRef = useRef(true);
@@ -18,18 +25,20 @@ const CartPage = () => {
     }
   }, []);
 
-  const cartItems = cart?.cart_items?.flatMap((cartItem) =>
-    cartItem.cart_item_details.map((detail) => ({
-      itemId: detail.id,
-      quantity: detail.quantity || 0,
-      item: detail.items || { name: 'Unknown item', price: 0 },
-      instructions: detail.instructions || '',
-    }))
-  ) || [];
+  const cartItems =
+    cart?.cart_items?.flatMap((cartItem) =>
+      cartItem.cart_item_details.map((detail) => ({
+        itemId: detail.id,
+        quantity: detail.quantity || 0,
+        item: detail.items || { name: "Unknown item", price: 0 },
+        instructions: detail.instructions || "",
+      }))
+    ) || [];
 
   const totalPrice =
     cartItems?.reduce(
-      (total, cartItem) => total + (cartItem.item?.price || 0) * (cartItem.quantity || 0),
+      (total, cartItem) =>
+        total + (cartItem.item?.price || 0) * (cartItem.quantity || 0),
       0
     ) || 0;
 
@@ -62,6 +71,11 @@ const CartPage = () => {
       setActionLoading(false);
     }
   };
+  const handleCheckout = () => {
+    //setShowPrompt(false);
+    completeCart();
+    navigate("/");
+  };
 
   if (loading)
     return <p className="text-center text-gray-600">Loading your cart...</p>;
@@ -71,7 +85,9 @@ const CartPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h1 className="text-center text-3xl font-semibold mb-6">Welcome to Your Cart</h1>
+      <h1 className="text-center text-3xl font-semibold mb-6">
+        Welcome to Your Cart
+      </h1>
 
       {cartItems.map(({ itemId, quantity, item }) => (
         <div
@@ -131,7 +147,7 @@ const CartPage = () => {
         </button>
 
         <button
-          onClick={() => navigate("/checkout")}
+          onClick={handleCheckout}
           className="px-6 py-3 bg-blue-600 hover:bg-indigo-600 text-white font-semibold rounded-lg shadow transition"
         >
           Check Out
