@@ -116,7 +116,10 @@ const ItemsPage = () => {
   return (
     <>
       <section className="bg-gray-100 py-8 mb-12 shadow-sm rounded-b-lg">
-        <h1 className="text-6xl text-center text-black-600 font-semibold">Menu</h1>
+        <h1 className="text-6xl text-center text-black-600 pb-3 font-semibold">Menu</h1>
+        <h3 className="text-center text-gray-600 max-w-2xl mx-auto">
+          "Discover handcrafted coffee, fresh-baked pastries, and gourmet sandwiches made with care—every item on our menu is a little moment of joy."</h3>
+          <p className="text-center text-blue-600 mt-4 max-w-xl mx-auto">Our café does not accept requests for order modifications at this time.</p>
       </section>
 
       <div className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">

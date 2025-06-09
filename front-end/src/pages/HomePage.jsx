@@ -29,33 +29,43 @@ const HomePage = () => {
       </div>
 
       {/* Featured Items */}
-      <section className="max-w-6xl mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Featured Items</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {featuredItems.map((item) => (
-            <Link
-              to={`/menu/${item.id}`}
-              key={item.id}
-              className="transform transition duration-300 hover:scale-105"
-            >
-              <div className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-blue-300 hover:shadow-2xl p-6 h-full flex flex-col justify-between">
-                <h3 className="text-xl font-semibold text-gray-800">{item.name}</h3>
-                <p className="text-gray-600 mt-2 flex-grow">{item.description}</p>
-                <div className="mt-4 text-right font-bold text-blue-500">{item.price}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
+{/* Featured Items */}
+<section className="max-w-6xl mx-auto px-6 py-12">
+  <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+    Featured Items
+  </h2>
 
-        <div className="text-center mt-10">
-          <Link
-            to="/menu"
-            className="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow hover:bg-indigo-600 transition duration-300"
-          >
-            Browse Full Menu
-          </Link>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {featuredItems.map((item) => (
+      <div
+        key={item.id}
+        className="transform transition duration-300 hover:scale-105"
+      >
+        <div className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-blue-300 hover:shadow-2xl p-6 h-full flex flex-col justify-between">
+          <h3 className="text-xl font-semibold text-gray-800">
+            {item.name}
+          </h3>
+          <p className="text-gray-600 mt-2 flex-grow">
+            {item.description}
+          </p>
+          <div className="mt-4 text-right font-bold text-blue-500">
+            {item.price}
+          </div>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+
+  <div className="text-center mt-10">
+    <Link
+      to="/menu"
+      className="inline-block bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow hover:bg-indigo-600 transition duration-300"
+    >
+      Browse Full Menu
+    </Link>
+  </div>
+</section>
+
       {/* Footer */}
       <Footer />
     </div>

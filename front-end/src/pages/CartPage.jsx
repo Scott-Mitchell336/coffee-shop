@@ -88,6 +88,7 @@ const CartPage = () => {
       <h1 className="text-center text-3xl font-semibold mb-6">
         Welcome to Your Cart
       </h1>
+      <p className="text-center text-blue-600 max-w-xl mx-auto">Our café does not accept requests for order modifications at this time.</p>
 
       {cartItems.map(({ itemId, quantity, item }) => (
         <div
