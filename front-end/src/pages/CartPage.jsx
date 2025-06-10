@@ -84,29 +84,30 @@ const CartPage = () => {
     return <p className="text-center text-gray-600">Your cart is empty.</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h1 className="text-center text-3xl font-semibold mb-6">
+    <div className="max-w-3xl mx-auto p-4 bg-white rounded-lg shadow-md mt-10">
+      <h1 className="text-center text-3xl font-semibold mb-4">
         Welcome to Your Cart
       </h1>
-      <p className="text-center text-blue-600 max-w-xl mx-auto">Our café does not accept requests for order modifications at this time.</p>
+      <p className="text-center text-blue-600 max-w-xl mx-auto p-8">Our cafe does not accept requests for order modifications at this time.</p>
 
       {cartItems.map(({ itemId, quantity, item }) => (
         <div
           key={itemId}
           className="flex items-center justify-between border-b border-gray-200 py-4"
         >
-          <div className="flex items-center space-x-4">
-            {item.imageUrl && (
-              <img
-                src={item.imageUrl}
-                alt={item.name}
-                className="w-20 h-20 object-cover rounded-md"
-              />
-            )}
+          <div className="flex items-center space-x-10">
             <div>
               <h2 className="text-lg font-semibold">{item.name}</h2>
-              <p className="text-gray-600">${item.price.toFixed(2)}</p>
+              <p className="text-blue-600">${item.price.toFixed(2)}</p>
             </div>
+            {item.image_url && (
+              <img
+                src={item.image_url}
+                alt={item.name}
+                className="object-contain rounded-md max-h-[50px] mr-6"
+              />
+            )}
+
           </div>
 
           <div className="flex items-center space-x-4">
@@ -136,7 +137,7 @@ const CartPage = () => {
       </div>
 
       {message && (
-        <p className="mt-4 text-center text-sm text-green-600">{message}</p>
+        <p className="mt-4 text-center text-med text-red-600">{message}</p>
       )}
 
       <div className="mt-8 flex justify-between">

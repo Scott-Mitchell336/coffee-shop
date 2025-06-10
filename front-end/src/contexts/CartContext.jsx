@@ -1,6 +1,13 @@
-import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { useAuth } from './AuthContext'; // Import useAuth
-import { cartApi } from '../api/api'; // Import the cartApi functions
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
+import { useAuth } from "./AuthContext"; // Import useAuth
+import { cartApi } from "../api/api"; // Import the cartApi functions
 import { saveGuestCartId } from "../utils/cart";
 
 const CartContext = createContext();
@@ -10,7 +17,7 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const fetchInProgressRef = useRef(false); // Track if fetch is in progress
-  const prevUserRef = useRef(null);  // Track previous user to detect changes
+  const prevUserRef = useRef(null); // Track previous user to detect changes
 
   // Get or create appropriate cart on component mount or when user changes
   useEffect(() => {
@@ -23,22 +30,29 @@ export const CartProvider = ({ children }) => {
     const userChanged = prevUserRef.current !== user?.id;
     prevUserRef.current = user?.id;
 
-    const currentAuthRequest = authRequest; 
+    const currentAuthRequest = authRequest;
     const currentPublicRequest = publicRequest;
-    
+
     const fetchCart = async () => {
-      console.log(`fetchCart called at: ${new Date().toISOString()} for user: ${user?.id || 'guest'}`);
-      
+      console.log(
+        `fetchCart called at: ${new Date().toISOString()} for user: ${
+          user?.id || "guest"
+        }`
+      );
+
       // Set fetch in progress to prevent concurrent calls
       fetchInProgressRef.current = true;
       setLoading(true);
-      
+
       try {
         if (user) {
           // Logged-in user: get their cart
           try {
             console.log("Fetching cart for user:", user.id);
-            const cartData = await cartApi.getUserCart(currentAuthRequest, user.id);
+            const cartData = await cartApi.getUserCart(
+              currentAuthRequest,
+              user.id
+            );
             setCart(cartData);
           } catch (error) {
             if (error.status === 404) {
@@ -52,8 +66,11 @@ export const CartProvider = ({ children }) => {
           // Guest user: get or create guest cart
           let guestCartId = null;
           try {
-            guestCartId = localStorage.getItem('guestCartId');
-            console.log("Retrieved guestCartId from localStorage:", guestCartId);
+            guestCartId = localStorage.getItem("guestCartId");
+            console.log(
+              "Retrieved guestCartId from localStorage:",
+              guestCartId
+            );
           } catch (storageError) {
             console.error("Error accessing localStorage:", storageError);
           }
@@ -61,15 +78,21 @@ export const CartProvider = ({ children }) => {
           if (guestCartId) {
             // Try to fetch existing guest cart
             try {
-              const cartData = await cartApi.getGuestCart(currentPublicRequest, guestCartId);
+              const cartData = await cartApi.getGuestCart(
+                currentPublicRequest,
+                guestCartId
+              );
               setCart(cartData);
             } catch (error) {
               console.error("Error fetching guest cart:", error);
               console.log("Removing invalid guestCartId from localStorage");
               try {
-                localStorage.removeItem('guestCartId');
+                localStorage.removeItem("guestCartId");
               } catch (removeError) {
-                console.error("Error removing guestCartId from localStorage:", removeError);
+                console.error(
+                  "Error removing guestCartId from localStorage:",
+                  removeError
+                );
               }
               setCart(null);
             }
@@ -87,7 +110,7 @@ export const CartProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching cart:', error);
+        console.error("Error fetching cart:", error);
       } finally {
         setLoading(false);
         fetchInProgressRef.current = false;
@@ -98,7 +121,6 @@ export const CartProvider = ({ children }) => {
     if (userChanged) {
       fetchCart();
     }
-    
   }, [user, authRequest, publicRequest]);
 
   // Enable manual cart refresh
@@ -107,25 +129,28 @@ export const CartProvider = ({ children }) => {
       console.log("Cart refresh already in progress");
       return;
     }
-    
+
     console.log("Manual cart refresh requested");
-    
-    if (!user && !localStorage.getItem('guestCartId')) {
+
+    if (!user && !localStorage.getItem("guestCartId")) {
       console.log("No user or guest cart to refresh");
       return;
     }
-    
+
     fetchInProgressRef.current = true;
     setLoading(true);
-    
+
     try {
       if (user) {
         const cartData = await cartApi.getUserCart(authRequest, user.id);
         setCart(cartData);
       } else {
-        const guestCartId = localStorage.getItem('guestCartId');
+        const guestCartId = localStorage.getItem("guestCartId");
         if (guestCartId) {
-          const cartData = await cartApi.getGuestCart(publicRequest, guestCartId);
+          const cartData = await cartApi.getGuestCart(
+            publicRequest,
+            guestCartId
+          );
           setCart(cartData);
         }
       }
@@ -138,44 +163,48 @@ export const CartProvider = ({ children }) => {
   }, [user, authRequest, publicRequest]); // Add proper dependencies
 
   // Add item to cart
-  const addItemToCart = async (itemId, quantity = 1, instructions = '') => {
-    
-    console.log("addItemToCart called with:", { itemId, quantity, instructions });
+  const addItemToCart = async (itemId, quantity = 1, instructions = "") => {
+    console.log("addItemToCart called with:", {
+      itemId,
+      quantity,
+      instructions,
+    });
     try {
       console.log("Adding item to cart:", { itemId, quantity, instructions });
       console.log("Current user:", user);
       if (user) {
         // Logged-in user
-        const updatedCart = await cartApi.addItemToCart(
-          authRequest, 
-          user.id, 
-          { itemId, quantity, instructions }
-        );
+        const updatedCart = await cartApi.addItemToCart(authRequest, user.id, {
+          itemId,
+          quantity,
+          instructions,
+        });
         setCart(updatedCart);
+        console.log("[CartContext] Cart after adding item:", updatedCart);
         return updatedCart;
       } else {
         // Guest user
-        let guestCartId = localStorage.getItem('guestCartId');
+        let guestCartId = localStorage.getItem("guestCartId");
         console.log("Guest cart ID:", guestCartId);
-        
+
         if (!guestCartId) {
           // Create a new guest cart if none exists
           const newCart = await cartApi.createGuestCart(publicRequest);
           guestCartId = newCart.id;
-          localStorage.setItem('guestCartId', guestCartId);
+          localStorage.setItem("guestCartId", guestCartId);
         }
-        
+
         // Add item to guest cart
         const updatedCart = await cartApi.addItemToGuestCart(
-          publicRequest, 
-          guestCartId, 
+          publicRequest,
+          guestCartId,
           { itemId, quantity, instructions }
         );
         setCart(updatedCart);
         return updatedCart;
       }
     } catch (error) {
-      console.error('Error adding item to cart:', error);
+      console.error("Error adding item to cart:", error);
       throw error;
     }
   };
@@ -195,12 +224,12 @@ export const CartProvider = ({ children }) => {
         return updatedCart;
       } else {
         // Guest user
-        const guestCartId = localStorage.getItem('guestCartId');
-        
+        const guestCartId = localStorage.getItem("guestCartId");
+
         if (!guestCartId) {
-          throw new Error('No guest cart found');
+          throw new Error("No guest cart found");
         }
-        
+
         const updatedCart = await cartApi.updateGuestCartItem(
           publicRequest,
           guestCartId,
@@ -211,7 +240,7 @@ export const CartProvider = ({ children }) => {
         return updatedCart;
       }
     } catch (error) {
-      console.error('Error updating cart item:', error);
+      console.error("Error updating cart item:", error);
       throw error;
     }
   };
@@ -230,12 +259,12 @@ export const CartProvider = ({ children }) => {
         return updatedCart;
       } else {
         // Guest user
-        const guestCartId = localStorage.getItem('guestCartId');
-        
+        const guestCartId = localStorage.getItem("guestCartId");
+
         if (!guestCartId) {
-          throw new Error('No guest cart found');
+          throw new Error("No guest cart found");
         }
-        
+
         const updatedCart = await cartApi.removeGuestCartItem(
           publicRequest,
           guestCartId,
@@ -245,7 +274,7 @@ export const CartProvider = ({ children }) => {
         return updatedCart;
       }
     } catch (error) {
-      console.error('Error removing cart item:', error);
+      console.error("Error removing cart item:", error);
       throw error;
     }
   };
@@ -256,31 +285,37 @@ export const CartProvider = ({ children }) => {
       if (user) {
         // User cart - first need to get the active cart ID
         if (!cart || !cart.id) {
-          throw new Error('No active cart found to complete');
+          throw new Error("No active cart found to complete");
         }
-        
+
         console.log(`Completing user cart with ID: ${cart.id}`);
-        const completedCart = await cartApi.completeCartById(authRequest, cart.id);
+        const completedCart = await cartApi.completeCartById(
+          authRequest,
+          cart.id
+        );
         setCart(null); // Clear the current cart after completion
         return completedCart;
       } else {
         // Guest cart
-        const guestCartId = localStorage.getItem('guestCartId');
-        
+        const guestCartId = localStorage.getItem("guestCartId");
+
         if (!guestCartId) {
-          throw new Error('No guest cart found to complete');
+          throw new Error("No guest cart found to complete");
         }
-        
+
         console.log(`Completing guest cart with ID: ${guestCartId}`);
-        const completedCart = await cartApi.completeGuestCartById(publicRequest, guestCartId);
-        
+        const completedCart = await cartApi.completeGuestCartById(
+          publicRequest,
+          guestCartId
+        );
+
         // Clear the guest cart ID from localStorage after completion
-        localStorage.removeItem('guestCartId');
+        localStorage.removeItem("guestCartId");
         setCart(null); // Clear the current cart
         return completedCart;
       }
     } catch (error) {
-      console.error('Error completing cart:', error);
+      console.error("Error completing cart:", error);
       throw error;
     }
   };
@@ -311,15 +346,21 @@ export const CartProvider = ({ children }) => {
   };*/
 
   return (
-    <CartContext.Provider value={{
-      cart,
-      loading,
-      addItemToCart,
-      updateCartItem,
-      removeCartItem,
-      refreshCart, // Export this new function
-      completeCart
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        loading,
+        addItemToCart,
+        updateCartItem,
+        removeCartItem,
+        refreshCart, // Export this new function
+        completeCart,
+        cartCount:
+          cart?.cart_items
+            ?.flatMap((ci) => ci.cart_item_details)
+            ?.reduce((sum, detail) => sum + (detail.quantity || 0), 0) || 0,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
