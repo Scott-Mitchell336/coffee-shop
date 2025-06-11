@@ -95,21 +95,31 @@ const CartPage = () => {
           key={itemId}
           className="flex items-center justify-between border-b border-gray-200 py-4"
         >
-          <div className="flex items-center space-x-10">
+          {/* Left section with image and text */}
+          <div className="flex items-center">
+            {/* Image container - fixed width for consistent alignment */}
+            <div className="w-16 h-16 flex items-center justify-center mr-4">
+              {item.image_url ? (
+                <img
+                  src={item.image_url}
+                  alt={item.name}
+                  className="object-contain max-h-[50px] max-w-full rounded-md"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
+                  <span className="text-gray-400 text-xs">No image</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Text information */}
             <div>
               <h2 className="text-lg font-semibold">{item.name}</h2>
               <p className="text-blue-600">${item.price.toFixed(2)}</p>
             </div>
-            {item.image_url && (
-              <img
-                src={item.image_url}
-                alt={item.name}
-                className="object-contain rounded-md max-h-[50px] mr-6"
-              />
-            )}
-
           </div>
 
+          {/* Right section with quantity input and remove button */}
           <div className="flex items-center space-x-4">
             <input
               type="number"
