@@ -55,11 +55,21 @@ export const CartProvider = ({ children }) => {
             );
             setCart(cartData);
           } catch (error) {
-            if (error.status === 404) {
+            // Log the full error object to see its structure
+            console.log("Error fetching user cart:", error);
+
+            // Check for status code in different possible locations
+            const statusCode = error.status || error.response?.status || error.statusCode;
+            console.log("Extracted status code:", statusCode);
+
+            if (statusCode === 404) {
               console.log("Cart not found for user.id:", user.id);
               setCart(null);
             } else {
-              throw error;
+              // For other errors, you might want to show an error message
+              console.error("Failed to fetch cart:", error);
+              // Uncomment if you want to re-throw the error
+              // throw error;
             }
           }
         } else {
